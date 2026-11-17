@@ -1,0 +1,26 @@
+{
+  "name": "damper-backend",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "typecheck": "tsc -p . --noEmit",
+    "scan": "tsx src/cli/scan.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@blend-capital/blend-sdk": "4.0.0",
+    "@stellar/stellar-sdk": "17.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2",
+    "vitest": "5.1.0"
+  }
+}
