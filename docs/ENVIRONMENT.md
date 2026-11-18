@@ -25,6 +25,8 @@ Every other keeper flag also has an environment-variable form, read when the fla
 
 A flag given on the command line always wins over its environment variable.
 
+`--state <path>` (or `DAMPER_STATE_FILE`) persists the suspicious-move hold clock to a JSON file, read at the start of a pass and written at the end. A long-running keeper does not need it — the clock already lives in memory for as long as the process does. A keeper that restarts every pass does: without it, a hold could never expire (see [ADR 0008](adr/0008-github-actions-keeper.md)).
+
 Node 20 or newer.
 
 ## Commands
@@ -53,9 +55,14 @@ npm run keeper -- --oracle C... [--network mainnet|testnet] [--rpc URL] [--once]
 
 ## Deploying the keeper
 
-[`render.yaml`](../render.yaml) runs the keeper as a Render Background Worker: no public port, restarted on crash, which fits a process that only ever submits transactions and pings a monitor. In the Render dashboard, "New +" → "Blueprint", point it at this repository, then fill in the env vars it asks for (`DAMPER_ORACLE` at minimum; the rest turn on submitting, evidence, alerts and the heartbeat). The scheduled scan-and-publish workflow is unrelated and keeps running on GitHub Actions.
+[`keeper.yml`](../.github/workflows/keeper.yml) runs the keeper on a GitHub Actions schedule (every 5 minutes, free on a public repository). Set it up under the repository's Settings → Secrets and variables → Actions:
 
-Start with `DAMPER_SUBMIT=false` (the blueprint's default): the keeper still reports, alerts and pings the heartbeat, so you can watch a new oracle before handing it a funded key.
+- **Secrets** (write-only once saved): `DAMPER_KEEPER_SECRET`, `DAMPER_ALERT_WEBHOOK`, `DAMPER_HEARTBEAT_URL`.
+- **Variables** (plain text): `DAMPER_ORACLE` (required), and any of `DAMPER_NETWORK`, `DAMPER_SUBMIT`, `DAMPER_POOL`, `DAMPER_EXPOSURE_USD`, `DAMPER_WEBHOOK_FORMAT`, `DAMPER_ALERT_MIN` you want to change from their defaults.
+
+Start with `DAMPER_SUBMIT` unset (the default is off): the keeper still reports, alerts and pings the heartbeat, so a new oracle can be watched before it is trusted with a funded key. See [decision record 0008](adr/0008-github-actions-keeper.md) for why a scheduled run needs `--state` where a long-running one would not.
+
+[`render.yaml`](../render.yaml) runs the same keeper as a Render Background Worker instead: no public port, restarted on crash, and no per-pass state file needed since the process stays up. Render has no free tier for one, so this is left in the repository as a working alternative rather than deployed; see [decision record 0007](adr/0007-render-worker.md).
 
 ## Notes
 

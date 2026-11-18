@@ -1,6 +1,6 @@
 # 0007. Run the keeper as a Render Background Worker, configured entirely by environment
 
-Status: accepted, 2026-11-18
+Status: **superseded by [0008](0008-github-actions-keeper.md), 2026-11-18** — Render's Background Workers have no free tier, and the API call to create one returned `402 Payment Required` with no payment method on file. Rather than add billing for this, the keeper now runs on a GitHub Actions schedule, which is free for a public repository. The environment-variable surface this record set up (`DAMPER_ORACLE`, `DAMPER_SUBMIT`, ...) was kept and is exactly what 0008 reuses, so `render.yaml` remains a working option if a provider with a free tier, or a funded Render account, is wanted later; it is left in the repository for that but is not deployed.
 
 ## Context
 

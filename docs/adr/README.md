@@ -10,4 +10,5 @@ Short notes on why the backend is built the way it is.
 | [0004](0004-evidence-from-the-order-book.md) | Market evidence from the order book, with a fixed or pool-derived exposure | Accepted |
 | [0005](0005-alert-delivery.md) | Alert delivery by webhook, planned by a pure function | Accepted |
 | [0006](0006-heartbeat.md) | A heartbeat so a dead keeper is noticed | Accepted |
-| [0007](0007-render-worker.md) | Run the keeper as a Render Background Worker, configured entirely by environment | Accepted |
+| [0007](0007-render-worker.md) | Run the keeper as a Render Background Worker, configured entirely by environment | Superseded by 0008 |
+| [0008](0008-github-actions-keeper.md) | Run the keeper on a GitHub Actions schedule, with its hold-state persisted | Accepted |

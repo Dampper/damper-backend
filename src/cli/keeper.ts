@@ -5,6 +5,7 @@ import { tick, type TickReport } from '../keeper/run.js';
 import { fixedExposure, poolExposure } from '../keeper/market-evidence.js';
 import { Heartbeat } from '../keeper/heartbeat.js';
 import { NOTIFY_DEFAULTS, Notifier, parseWebhookUrl, type WebhookFormat } from '../keeper/notify.js';
+import { loadState, saveState, toMap } from '../keeper/state.js';
 
 const { values: flags } = parseArgs({
   options: {
@@ -22,6 +23,7 @@ const { values: flags } = parseArgs({
     'alert-reminder-hours': { type: 'string' },
     'test-alert': { type: 'boolean', default: false },
     'test-heartbeat': { type: 'boolean', default: false },
+    state: { type: 'string' },
   },
 });
 
@@ -45,6 +47,7 @@ const values = {
   'webhook-format': flags['webhook-format'] ?? env('DAMPER_WEBHOOK_FORMAT') ?? 'json',
   'alert-min': flags['alert-min'] ?? env('DAMPER_ALERT_MIN') ?? 'warn',
   'alert-reminder-hours': flags['alert-reminder-hours'] ?? env('DAMPER_ALERT_REMINDER_HOURS') ?? '6',
+  state: flags.state ?? env('DAMPER_STATE_FILE'),
 };
 
 const TESTNET: Network = {
@@ -142,7 +145,11 @@ async function main() {
     return;
   }
 
-  const suspicious = new Map<string, number>();
+  // How long each asset's move has looked suspicious (ADR 0003) lives in this map. A
+  // long-running process keeps it for free; a process that restarts every pass (a scheduled
+  // job, a crash) does not, so a hold could never expire without reading it back here (ADR
+  // 0008). Without --state this is exactly the old in-memory-only behaviour.
+  const suspicious = values.state ? toMap(await loadState(values.state)) : new Map<string, number>();
   const every = Math.max(60, Number(values.interval)) * 1000;
   for (;;) {
     let report: TickReport | undefined;
@@ -157,6 +164,9 @@ async function main() {
     }
     await notifier?.afterPass(report, failure, Math.floor(Date.now() / 1000));
     await heartbeat?.afterPass(report, failure);
+    if (values.state) {
+      await saveState(values.state, suspicious).catch((e) => console.error(`could not save --state: ${(e as Error).message}`));
+    }
     if (values.once) return;
     await new Promise((r) => setTimeout(r, every));
   }

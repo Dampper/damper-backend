@@ -6,7 +6,8 @@ All notable changes to this repository are listed here. The format follows [Keep
 
 ### Added
 
-- `render.yaml`: deploy the keeper as a Render Background Worker. Every CLI flag also reads from a same-named environment variable, so it needs no constructed argument string.
+- `render.yaml`: deploy the keeper as a Render Background Worker. Every CLI flag also reads from a same-named environment variable, so it needs no constructed argument string. Superseded as the deployed path by the GitHub Actions workflow below (Render has no free tier), but left in the repository.
+- `.github/workflows/keeper.yml`: run the keeper every 5 minutes on GitHub Actions instead, at no hosting cost. A `--state` file persists the suspicious-move hold clock (ADR 0003) across the fresh process each run starts, published to its own `keeper-state` branch.
 - Pool scanner: discovers Blend V2 and V2.1 pools, traces each reserve's price to its upstream feed through Blend's oracle aggregator, reads SDEX depth and volume for DEX-priced assets, and scores collateral-side and debt-side exposure against the capital needed to move the price.
 - Notes on aggregator `max_dev` (one round of lookback) and on fixed-price collateral.
 - Keeper: pokes anchors when due, holds pokes when the raw price is far from the anchor, and reports unseeded policies, lost quorum and a binding clamp. Dry run by default.
