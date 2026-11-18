@@ -11,11 +11,17 @@ Node 20 or newer.
 ## Commands
 
 ```sh
-npm run scan -- [--registry data/pools.json] [--out reports/latest.json] [--pool C... ...]
+npm run scan -- [--registry data/pools.json] [--out reports/latest.json] [--pool C... ...] [--merge-from URL|FILE]
 npm run keeper -- --oracle C... [--network mainnet|testnet] [--rpc URL] [--once] [--interval 300] [--submit]
 ```
 
 `--interval` is in seconds and is raised to at least 60. Without `--submit` the keeper only reports.
+
+`--merge-from` merges a previously published pool registry before discovering, so pools seen on earlier runs are kept. The scheduled workflow uses it with the registry on the `reports` branch.
+
+## Published report
+
+[`publish-report.yml`](../.github/workflows/publish-report.yml) scans every 6 hours and force-pushes a single commit to the `reports` branch containing `latest.json` (the scan) and `pools.json` (the registry). The dashboard reads `https://raw.githubusercontent.com/UbsOrg/damper-backend/reports/latest.json`. The workflow refuses to publish a report with no pools.
 
 ## Notes
 

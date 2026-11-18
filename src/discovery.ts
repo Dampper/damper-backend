@@ -27,6 +27,21 @@ export async function saveRegistry(path: string, registry: PoolRegistry) {
   await writeFile(path, JSON.stringify({ ...registry, pools: sorted }, null, 2) + '\n');
 }
 
+/** Union of two registries. A pool keeps the earliest `firstSeen`; the base entry wins on other fields. */
+export function mergeRegistry(base: PoolRegistry, other: unknown): PoolRegistry {
+  const pools = { ...base.pools };
+  const incoming = (other as Partial<PoolRegistry> | null | undefined)?.pools;
+  if (incoming && typeof incoming === 'object') {
+    for (const [id, entry] of Object.entries(incoming)) {
+      if (!/^C[A-Z2-7]{55}$/.test(id) || typeof entry !== 'object' || entry === null) continue;
+      const seen = pools[id];
+      if (!seen) pools[id] = entry;
+      else if (entry.firstSeen && entry.firstSeen < seen.firstSeen) pools[id] = { ...seen, firstSeen: entry.firstSeen };
+    }
+  }
+  return { ...base, pools };
+}
+
 export async function discoverPools(view: ViewClient, registry: PoolRegistry): Promise<string[]> {
   const now = new Date().toISOString();
   const add = (id: string, deployment: string, source: string) => {

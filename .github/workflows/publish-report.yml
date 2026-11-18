@@ -1,0 +1,64 @@
+name: Publish scan report
+
+# Scans every Blend pool and publishes the result to the `reports` branch, where the
+# dashboard (damper-frontend) reads it. The branch holds a single commit that is replaced on
+# each run, so it never grows. The pool registry is published with it: RPC nodes only remember
+# about seven days of events, so each run merges the last published registry before it
+# discovers anything new, and a schedule shorter than seven days never misses a pool.
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-report
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      - name: Scan (public RPC endpoints drop requests now and then, so retry)
+        env:
+          NODE_OPTIONS: --dns-result-order=ipv4first
+        run: |
+          for attempt in 1 2 3; do
+            npm run scan -- --merge-from "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/reports/pools.json" && break
+            echo "attempt $attempt failed"; sleep 30
+            [ "$attempt" = 3 ] && exit 1
+          done
+
+      - name: Refuse to publish an empty or broken report
+        run: |
+          node -e '
+            const r = JSON.parse(require("fs").readFileSync("reports/latest.json", "utf8"));
+            if (!Array.isArray(r.pools) || r.pools.length === 0) { console.error("no pools scanned"); process.exit(1); }
+            console.log(`${r.pools.length} pools, ${r.errors.length} skipped, ledger ${r.ledger}`);
+          '
+
+      - name: Publish to the reports branch
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir publish
+          cp reports/latest.json publish/latest.json
+          cp data/pools.json publish/pools.json
+          cd publish
+          git init -q -b reports
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Scan report $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push --force "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" reports

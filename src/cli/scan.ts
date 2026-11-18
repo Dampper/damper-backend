@@ -3,7 +3,8 @@ import { dirname } from 'node:path';
 import { parseArgs } from 'node:util';
 import { MAINNET } from '../config.js';
 import { ViewClient } from '../rpc.js';
-import { discoverPools, loadRegistry, saveRegistry } from '../discovery.js';
+import { readFile } from 'node:fs/promises';
+import { discoverPools, loadRegistry, mergeRegistry, saveRegistry } from '../discovery.js';
 import { scan, type PoolReport } from '../scan.js';
 
 const { values } = parseArgs({
@@ -11,6 +12,7 @@ const { values } = parseArgs({
     registry: { type: 'string', default: 'data/pools.json' },
     out: { type: 'string', default: 'reports/latest.json' },
     pool: { type: 'string', multiple: true },
+    'merge-from': { type: 'string' },
   },
 });
 
@@ -21,7 +23,8 @@ async function main() {
   const view = new ViewClient(MAINNET);
   let ids = values.pool ?? [];
   if (ids.length === 0) {
-    const registry = await loadRegistry(values.registry!);
+    let registry = await loadRegistry(values.registry!);
+    if (values['merge-from']) registry = await mergeFrom(registry, values['merge-from']);
     ids = await discoverPools(view, registry);
     await saveRegistry(values.registry!, registry);
   }
@@ -37,6 +40,19 @@ async function main() {
     for (const e of report.errors) console.log(`  ${e.pool}  ${e.error.slice(0, 120)}`);
   }
   console.log(`\nFull report: ${values.out}`);
+}
+
+/** Merge a previously published registry (URL or file) so pools seen on earlier runs are never lost. */
+async function mergeFrom(registry: Awaited<ReturnType<typeof loadRegistry>>, source: string) {
+  try {
+    const text = /^https?:/.test(source) ? await (await fetch(source)).text() : await readFile(source, 'utf8');
+    const merged = mergeRegistry(registry, JSON.parse(text));
+    console.log(`merged registry from ${source}: ${Object.keys(registry.pools).length} -> ${Object.keys(merged.pools).length} pools`);
+    return merged;
+  } catch (e) {
+    console.log(`could not merge registry from ${source}: ${(e as Error).message}`);
+    return registry;
+  }
 }
 
 function printPool(p: PoolReport) {

@@ -10,3 +10,4 @@ All notable changes to this repository are listed here. The format follows [Keep
 - Notes on aggregator `max_dev` (one round of lookback) and on fixed-price collateral.
 - Keeper: pokes anchors when due, holds pokes when the raw price is far from the anchor, and reports unseeded policies, lost quorum and a binding clamp. Dry run by default.
 - First mainnet scan results in the README.
+- Scheduled workflow that publishes the scan to the `reports` branch for the dashboard, with `--merge-from` so the pool registry survives the RPC's seven-day event retention.
