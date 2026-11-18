@@ -6,10 +6,11 @@
 - Keeper: anchor pokes, hold on suspicious moves, alerts in the log; run end to end against a testnet oracle.
 - Scheduled report publishing for the dashboard.
 - Market evidence published to the oracle's cost gate, run end to end on testnet.
+- Alert delivery to a webhook, with de-duplication, reminders, resolution notices and retries.
 
 ## Next
 
-- **Alert delivery.** Alerts only reach the log. Add a webhook (and a way to test it) so `suspicious-move`, `no-quote` and `unseeded` reach a person.
+- **A heartbeat for the keeper itself.** A dead process cannot announce its death. Ping an external monitor each pass so silence becomes an alert.
 - **Historical pool discovery.** RPC nodes keep about seven days of events, so pools deployed earlier and outside a reward zone are only found if seeded. Backfill from ledger archives.
 - **AMM-aware depth.** The order-book model ignores classic liquidity pools and Soroban AMMs. Model them, since they absorb a manipulated print through arbitrage. This also affects the cost the keeper publishes as evidence.
 - **Evidence for assets without a DEX market**, such as exchange-priced assets, which currently stay on the oracle's tight rate.

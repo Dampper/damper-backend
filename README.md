@@ -96,7 +96,18 @@ Evidence is published when none exists or a third of its life is used. Cost come
 
 Alerts, because a binding clamp looks like a normal price to the pool: `unseeded` and `no-quote` (the oracle returns nothing, so borrows revert), `suspicious-move`, `hold-expired`, `clamp-binding` (upstreams and quote differ by more than 2%), `anchor-stale`, `no-policy`, and for gated assets `evidence-stale` (the oracle is on its tight rate because no fresh evidence exists) and `gate-tight` (an attack in that direction would pay, so that direction is on its tight rate).
 
-Not built yet: delivering alerts anywhere except the log.
+### Getting alerts to a person
+
+Set `DAMPER_ALERT_WEBHOOK` to a Slack, Discord or generic webhook URL (it is a secret, so it is read only from the environment and is never printed beyond its host name):
+
+```sh
+DAMPER_ALERT_WEBHOOK=https://hooks.slack.com/services/... npm run keeper -- --oracle C... --webhook-format slack --test-alert   # check it works
+DAMPER_ALERT_WEBHOOK=...  npm run keeper -- --oracle C... --webhook-format slack --alert-min warn --alert-reminder-hours 6 --submit
+```
+
+A new alert is sent once, one that persists is mentioned again after the reminder interval, and one that clears is reported as resolved. A delivery that fails is retried on the next pass, so a short outage loses nothing. The keeper reports itself too: `tick-failing` (critical) after three failed passes in a row, and `action-failed` when a poke or an evidence publish does not land. See [decision record 0005](docs/adr/0005-alert-delivery.md).
+
+A keeper process that dies outright cannot announce it. Run it under a supervisor and add an external heartbeat monitor.
 
 ## Development
 

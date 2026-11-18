@@ -3,6 +3,7 @@ import { parseArgs } from 'node:util';
 import { MAINNET, type Network } from '../config.js';
 import { tick, type TickReport } from '../keeper/run.js';
 import { fixedExposure, poolExposure } from '../keeper/market-evidence.js';
+import { NOTIFY_DEFAULTS, Notifier, parseWebhookUrl, type WebhookFormat } from '../keeper/notify.js';
 
 const { values } = parseArgs({
   options: {
@@ -15,6 +16,10 @@ const { values } = parseArgs({
     pool: { type: 'string' },
     'exposure-usd': { type: 'string' },
     'market-horizon': { type: 'string' },
+    'webhook-format': { type: 'string', default: 'json' },
+    'alert-min': { type: 'string', default: 'warn' },
+    'alert-reminder-hours': { type: 'string', default: '6' },
+    'test-alert': { type: 'boolean', default: false },
   },
 });
 
@@ -70,15 +75,45 @@ async function main() {
     };
   }
 
+  // Alerts reach a person through a webhook. The URL is a secret, so it comes from the
+  // environment only and is never printed.
+  let notifier: Notifier | undefined;
+  const hook = process.env.DAMPER_ALERT_WEBHOOK;
+  if (hook) {
+    const format = values['webhook-format'] as WebhookFormat;
+    if (!['json', 'slack', 'discord'].includes(format)) throw new Error('--webhook-format must be json, slack or discord');
+    const min = values['alert-min'];
+    if (min !== 'critical' && min !== 'warn' && min !== 'info') throw new Error('--alert-min must be critical, warn or info');
+    const hours = Number(values['alert-reminder-hours']);
+    if (!(hours > 0)) throw new Error('--alert-reminder-hours must be a positive number');
+    const url = parseWebhookUrl(hook);
+    notifier = new Notifier(url, format, { network: values.network!, oracle: values.oracle }, { ...NOTIFY_DEFAULTS, minSeverity: min, reminderSecs: hours * 3600 });
+    console.log(`alerts: ${min} and above go to ${url.host} (${format}), reminders every ${hours} h`);
+  } else if (values['test-alert']) {
+    throw new Error('--test-alert needs DAMPER_ALERT_WEBHOOK in the environment');
+  } else {
+    console.log('alerts: log only (set DAMPER_ALERT_WEBHOOK to send them to a channel)');
+  }
+  if (values['test-alert']) {
+    await notifier!.test(Math.floor(Date.now() / 1000));
+    console.log('test alert delivered');
+    return;
+  }
+
   const suspicious = new Map<string, number>();
   const every = Math.max(60, Number(values.interval)) * 1000;
   for (;;) {
+    let report: TickReport | undefined;
+    let failure: string | undefined;
     try {
-      printReport(await tick({ network, oracle: values.oracle, signer, evidence }, suspicious));
+      report = await tick({ network, oracle: values.oracle, signer, evidence }, suspicious);
+      printReport(report);
     } catch (e) {
-      console.error(`tick failed: ${(e as Error).message}`);
+      failure = (e as Error).message;
+      console.error(`tick failed: ${failure}`);
       if (values.once) process.exitCode = 1;
     }
+    await notifier?.afterPass(report, failure, Math.floor(Date.now() / 1000));
     if (values.once) return;
     await new Promise((r) => setTimeout(r, every));
   }

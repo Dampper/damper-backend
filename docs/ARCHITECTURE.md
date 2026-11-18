@@ -33,6 +33,7 @@ Upstream feeds are classified by what is on-chain: the known Reflector DEX and C
 | Read | [`keeper/chain.ts`](src/keeper/chain.ts) | For every asset the oracle serves: policy, anchor, raw median and quote |
 | Decide | [`keeper/decide.ts`](src/keeper/decide.ts) | Pure function returning `poke`, `wait`, `hold` or `skip` plus alerts ([ADR 0003](adr/0003-keeper-holds-on-suspicious-moves.md)) |
 | Evidence | [`keeper/evidence.ts`](src/keeper/evidence.ts), [`market-evidence.ts`](src/keeper/market-evidence.ts) | For gated assets: reads the order book for the cost, a pool or a fixed number for the exposure, and builds the evidence. Repeats the contract's gate rule so alerts match what the oracle does ([ADR 0004](adr/0004-evidence-from-the-order-book.md)) |
+| Notify | [`keeper/notify.ts`](src/keeper/notify.ts) | A pure planner decides what to send (new, reminder, resolved; failed deliveries are retried next pass), then delivers to a webhook with retries ([ADR 0005](adr/0005-alert-delivery.md)) |
 | Act | [`keeper/run.ts`](src/keeper/run.ts), `chain.ts` | Simulates, signs and submits `poke` and `publish_evidence`, or reports in dry run |
 
 `rpc.ts` does reads by simulating a call from a throwaway account, so no funded account is needed to read.
