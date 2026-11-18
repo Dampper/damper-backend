@@ -48,18 +48,37 @@ Two pools in the registry could not be scanned: one is a V1 pool (`CDE65QK2…`)
 - Cost is capital required, not loss: the attacker keeps the asset they buy.
 - Depeg risk for fixed-price collateral is flagged but not scored.
 
-## Keeper (M2)
+## Keeper
 
-Will publish per-asset manipulation-cost estimates to the Damper registry contract so the guarded oracle can tighten its clamp when a market is cheap to move.
+Keeps a [Damper oracle](https://github.com/UbsOrg/damper-contracts) healthy: pokes each asset's anchor when it is due, and reports what the pool cannot see for itself.
 
-## Alerts (M2)
+```sh
+# dry run: read the oracle and report what it would do
+npm run keeper -- --network testnet --oracle C... --once
 
-Will flag anomalies on markets that feed lending-pool oracles: resting offers far from the market price, sudden depth withdrawal, and single trades that dominate a VWAP window.
+# live: poke anchors every 5 minutes (the signer must be the oracle's keeper address)
+DAMPER_KEEPER_SECRET=S... npm run keeper -- --network testnet --oracle C... --submit
+```
+
+The secret is read only from the environment and never printed. The keeper refuses to start if its key is not the oracle's configured keeper, since the contract would reject every poke.
+
+Per asset, [`decide.ts`](src/keeper/decide.ts) returns one of:
+
+| Action | When |
+|---|---|
+| `poke` | the anchor is older than the contract's 300 s minimum (plus a margin) and nothing looks wrong |
+| `wait` | the anchor moved too recently |
+| `hold` | the raw upstream price is more than 1.5x away from the anchor in a bounded direction. Poking would walk the anchor towards a possible pump, so pokes are held for up to 6 hours, after which the move is treated as real and pokes resume with a critical alert |
+| `skip` | no policy, no seeded anchor, or no quote; all three are reported |
+
+Alerts, because a binding clamp looks like a normal price to the pool: `unseeded` and `no-quote` (the oracle returns nothing, so borrows revert), `suspicious-move`, `hold-expired`, `clamp-binding` (upstreams and quote differ by more than 2%), `anchor-stale`, `no-policy`.
+
+Not built yet: publishing manipulation-cost estimates on-chain (the contract's cost gate does not exist yet), and delivering alerts anywhere except the log.
 
 ## Development
 
 ```sh
-npm test          # vitest, no network
+npm test          # vitest, no network (pool scoring, order-book math, keeper decisions)
 npm run typecheck
 ```
 

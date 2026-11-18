@@ -11,6 +11,7 @@
     "build": "tsc -p .",
     "typecheck": "tsc -p . --noEmit",
     "scan": "tsx src/cli/scan.ts",
+    "keeper": "tsx src/cli/keeper.ts",
     "test": "vitest run"
   },
   "dependencies": {
