@@ -206,12 +206,14 @@ export interface DeliverOptions {
   fetchImpl?: typeof fetch;
   attempts?: number;
   timeoutMs?: number;
+  /** `GET` sends no body (for a heartbeat ping). Default `POST`. */
+  method?: 'GET' | 'POST';
   /** Test hook: replaces the real wait between attempts. */
   sleep?: (ms: number) => Promise<void>;
 }
 
 /**
- * POST the payload. Retries network errors, 429 (honouring Retry-After, at most 30 s) and 5xx;
+ * POST the payload (or, with `method: 'GET'`, just request the URL). Retries network errors, 429 (honouring Retry-After, at most 30 s) and 5xx;
  * a 4xx that is not 429 means the URL or payload is wrong, so it fails at once. Errors name
  * only the host: the rest of a webhook URL is the secret.
  */
@@ -224,9 +226,10 @@ export async function deliver(url: URL, payload: unknown, opts: DeliverOptions =
     let wait = 1000 * 2 ** (i - 1);
     try {
       const res = await fetchImpl(url, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(payload),
+        method: opts.method ?? 'POST',
+        ...((opts.method ?? 'POST') === 'POST'
+          ? { headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) }
+          : {}),
         signal: AbortSignal.timeout(opts.timeoutMs ?? 10_000),
       });
       if (res.ok) return;

@@ -107,7 +107,7 @@ DAMPER_ALERT_WEBHOOK=...  npm run keeper -- --oracle C... --webhook-format slack
 
 A new alert is sent once, one that persists is mentioned again after the reminder interval, and one that clears is reported as resolved. A delivery that fails is retried on the next pass, so a short outage loses nothing. The keeper reports itself too: `tick-failing` (critical) after three failed passes in a row, and `action-failed` when a poke or an evidence publish does not land. See [decision record 0005](docs/adr/0005-alert-delivery.md).
 
-A keeper process that dies outright cannot announce it. Run it under a supervisor and add an external heartbeat monitor.
+A keeper that dies outright cannot announce it, so it pings an external monitor after each healthy pass (`DAMPER_HEARTBEAT_URL`, for example a healthchecks.io check). The monitor alerts when the pings stop, which covers a crash, a hang and a lost host. A pass that failed does not ping. See [decision record 0006](docs/adr/0006-heartbeat.md).
 
 ## Development
 

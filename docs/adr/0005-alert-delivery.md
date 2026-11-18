@@ -24,5 +24,5 @@ The keeper also reports itself: after three passes in a row fail, it raises a cr
 - A channel gets one message per problem, a reminder if it persists, and a closing note, not one per pass.
 - A short outage of the receiver loses nothing: alerts are re-sent when it is back.
 - State is in memory, so a restart tells people again about whatever is still firing. That is noisy but never silent.
-- **A keeper that dies outright cannot announce it.** `tick-failing` covers a keeper that runs but cannot do its job. For a dead process, run it under a supervisor and add an external heartbeat monitor; the keeper does not ping one yet (see the roadmap).
+- **A keeper that dies outright cannot announce it.** `tick-failing` covers a keeper that runs but cannot do its job. For a dead process, the keeper pings an external heartbeat monitor instead, see [0006](0006-heartbeat.md).
 - Severity filtering (`--alert-min`) is the only routing: one channel, one threshold.

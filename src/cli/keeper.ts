@@ -3,6 +3,7 @@ import { parseArgs } from 'node:util';
 import { MAINNET, type Network } from '../config.js';
 import { tick, type TickReport } from '../keeper/run.js';
 import { fixedExposure, poolExposure } from '../keeper/market-evidence.js';
+import { Heartbeat } from '../keeper/heartbeat.js';
 import { NOTIFY_DEFAULTS, Notifier, parseWebhookUrl, type WebhookFormat } from '../keeper/notify.js';
 
 const { values } = parseArgs({
@@ -20,6 +21,7 @@ const { values } = parseArgs({
     'alert-min': { type: 'string', default: 'warn' },
     'alert-reminder-hours': { type: 'string', default: '6' },
     'test-alert': { type: 'boolean', default: false },
+    'test-heartbeat': { type: 'boolean', default: false },
   },
 });
 
@@ -100,6 +102,24 @@ async function main() {
     return;
   }
 
+  // A dead keeper cannot announce itself, so it pings an external monitor after each healthy
+  // pass and the monitor alerts on silence. The URL is a secret: environment only.
+  let heartbeat: Heartbeat | undefined;
+  const beat = process.env.DAMPER_HEARTBEAT_URL;
+  if (beat) {
+    heartbeat = Heartbeat.fromUrl(beat);
+    console.log(`heartbeat: pinging ${heartbeat.host} after each healthy pass`);
+  } else if (values['test-heartbeat']) {
+    throw new Error('--test-heartbeat needs DAMPER_HEARTBEAT_URL in the environment');
+  } else {
+    console.log('heartbeat: none (set DAMPER_HEARTBEAT_URL so a dead keeper is noticed)');
+  }
+  if (values['test-heartbeat']) {
+    await heartbeat!.ping();
+    console.log('test heartbeat delivered');
+    return;
+  }
+
   const suspicious = new Map<string, number>();
   const every = Math.max(60, Number(values.interval)) * 1000;
   for (;;) {
@@ -114,6 +134,7 @@ async function main() {
       if (values.once) process.exitCode = 1;
     }
     await notifier?.afterPass(report, failure, Math.floor(Date.now() / 1000));
+    await heartbeat?.afterPass(report, failure);
     if (values.once) return;
     await new Promise((r) => setTimeout(r, every));
   }

@@ -10,7 +10,6 @@
 
 ## Next
 
-- **A heartbeat for the keeper itself.** A dead process cannot announce its death. Ping an external monitor each pass so silence becomes an alert.
 - **Historical pool discovery.** RPC nodes keep about seven days of events, so pools deployed earlier and outside a reward zone are only found if seeded. Backfill from ledger archives.
 - **AMM-aware depth.** The order-book model ignores classic liquidity pools and Soroban AMMs. Model them, since they absorb a manipulated print through arbitrage. This also affects the cost the keeper publishes as evidence.
 - **Evidence for assets without a DEX market**, such as exchange-priced assets, which currently stay on the oracle's tight rate.
