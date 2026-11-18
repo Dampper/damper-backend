@@ -21,7 +21,7 @@ npm run keeper -- --oracle C... [--network mainnet|testnet] [--rpc URL] [--once]
 
 ## Published report
 
-[`publish-report.yml`](../.github/workflows/publish-report.yml) scans every 6 hours and force-pushes a single commit to the `reports` branch containing `latest.json` (the scan) and `pools.json` (the registry). The dashboard reads `https://raw.githubusercontent.com/UbsOrg/damper-backend/reports/latest.json`. The workflow refuses to publish a report with no pools.
+[`publish-report.yml`](../.github/workflows/publish-report.yml) scans every 6 hours and force-pushes a single commit to the `reports` branch containing `latest.json` (the scan) and `pools.json` (the registry). The dashboard reads `https://raw.githubusercontent.com/Dampper/damper-backend/reports/latest.json`. The workflow refuses to publish a report with no pools.
 
 ## Notes
 

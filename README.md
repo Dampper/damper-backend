@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/UbsOrg/.github/main/profile/damper-wordmark.png" alt="Damper" width="420">
+  <img src="https://raw.githubusercontent.com/Dampper/.github/main/profile/damper-wordmark.png" alt="Damper" width="420">
 </p>
 
 # Damper Backend
 
-[![CI](https://github.com/UbsOrg/damper-backend/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/UbsOrg/damper-backend/actions/workflows/ci.yml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE) ![Stellar](https://img.shields.io/badge/network-Stellar-informational)
+[![CI](https://github.com/Dampper/damper-backend/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Dampper/damper-backend/actions/workflows/ci.yml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE) ![Stellar](https://img.shields.io/badge/network-Stellar-informational)
 
-Off-chain services for [Damper](https://github.com/UbsOrg/damper-contracts), a manipulation-resistant price oracle for Blend lending pools on Stellar.
+Off-chain services for [Damper](https://github.com/Dampper/damper-contracts), a manipulation-resistant price oracle for Blend lending pools on Stellar.
 
 More documentation:
 
@@ -63,7 +63,7 @@ Two pools in the registry could not be scanned: one is a V1 pool (`CDE65QK2…`)
 
 ## Keeper
 
-Keeps a [Damper oracle](https://github.com/UbsOrg/damper-contracts) healthy: pokes each asset's anchor when it is due, and reports what the pool cannot see for itself.
+Keeps a [Damper oracle](https://github.com/Dampper/damper-contracts) healthy: pokes each asset's anchor when it is due, and reports what the pool cannot see for itself.
 
 ```sh
 # dry run: read the oracle and report what it would do
