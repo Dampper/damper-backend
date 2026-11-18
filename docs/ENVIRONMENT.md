@@ -13,9 +13,12 @@ Node 20 or newer.
 ```sh
 npm run scan -- [--registry data/pools.json] [--out reports/latest.json] [--pool C... ...] [--merge-from URL|FILE]
 npm run keeper -- --oracle C... [--network mainnet|testnet] [--rpc URL] [--once] [--interval 300] [--submit]
+                  [--pool C... | --exposure-usd N] [--market-horizon URL]
 ```
 
 `--interval` is in seconds and is raised to at least 60. Without `--submit` the keeper only reports.
+
+`--pool` or `--exposure-usd` turns on market evidence for gated assets: `--pool` reads the exposure from a Blend pool that uses the oracle (a scan of that pool each pass), `--exposure-usd` uses one number for every asset. `--market-horizon` is where order books are read (default `DAMPER_HORIZON_URL`, mainnet), which matters when the oracle is on testnet.
 
 `--merge-from` merges a previously published pool registry before discovering, so pools seen on earlier runs are kept. The scheduled workflow uses it with the registry on the `reports` branch.
 

@@ -84,9 +84,19 @@ Per asset, [`decide.ts`](src/keeper/decide.ts) returns one of:
 | `hold` | the raw upstream price is more than 1.5x away from the anchor in a bounded direction. Poking would walk the anchor towards a possible pump, so pokes are held for up to 6 hours, after which the move is treated as real and pokes resume with a critical alert |
 | `skip` | no policy, no seeded anchor, or no quote; all three are reported |
 
-Alerts, because a binding clamp looks like a normal price to the pool: `unseeded` and `no-quote` (the oracle returns nothing, so borrows revert), `suspicious-move`, `hold-expired`, `clamp-binding` (upstreams and quote differ by more than 2%), `anchor-stale`, `no-policy`.
+**Market evidence.** For an asset whose oracle has a cost gate, the keeper also publishes what it costs to move the price and what that would unlock, so the oracle can tighten its clamp where an attack would pay (see the [contracts README](https://github.com/Dampper/damper-contracts#readme)). Give it an exposure, from a live pool or one fixed number:
 
-Not built yet: publishing manipulation-cost estimates on-chain (the contract's cost gate does not exist yet), and delivering alerts anywhere except the log.
+```sh
+npm run keeper -- --network testnet --oracle C... --pool C...            # exposure from a Blend pool using the oracle
+npm run keeper -- --network testnet --oracle C... --exposure-usd 50000   # one number for every asset
+# --market-horizon URL reads order books from another Horizon (default: mainnet's)
+```
+
+Evidence is published when none exists or a third of its life is used. Cost comes from the asset's Stellar DEX order book against USDC ([decision record 0004](docs/adr/0004-evidence-from-the-order-book.md)). Assets with no DEX market get no evidence and stay on the oracle's tight rate.
+
+Alerts, because a binding clamp looks like a normal price to the pool: `unseeded` and `no-quote` (the oracle returns nothing, so borrows revert), `suspicious-move`, `hold-expired`, `clamp-binding` (upstreams and quote differ by more than 2%), `anchor-stale`, `no-policy`, and for gated assets `evidence-stale` (the oracle is on its tight rate because no fresh evidence exists) and `gate-tight` (an attack in that direction would pay, so that direction is on its tight rate).
+
+Not built yet: delivering alerts anywhere except the log.
 
 ## Development
 

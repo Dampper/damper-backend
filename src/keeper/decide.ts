@@ -1,3 +1,5 @@
+import { describeAmount, gateStatus, type GateConfig, type PublishedEvidence } from './evidence.js';
+
 /**
  * What the keeper does about one asset, given what the oracle reports. Pure: no network,
  * no clock, so every branch is unit-tested.
@@ -19,6 +21,12 @@ export interface AssetState {
   raw: bigint | undefined;
   /** What a pool reads from `lastprice`. */
   quote: bigint | undefined;
+  /** The cost gate, when the asset has one. */
+  gate?: GateConfig;
+  /** The evidence last published to the oracle. */
+  evidence?: PublishedEvidence;
+  /** The oracle's price decimals, for printing amounts. */
+  decimals?: number;
 }
 
 export const UNBOUNDED = 4_294_967_295; // u32::MAX, as in the contract
@@ -109,6 +117,8 @@ export function decide(
     return done({ kind: 'skip', reason: 'no quote' });
   }
 
+  if (s.gate) gateAlerts(s, s.gate, now, alerts);
+
   const age = now - s.anchor.timestamp;
   if (age > 2 * s.policy.windowSecs) {
     alerts.push({
@@ -160,4 +170,37 @@ export function decide(
     return done({ kind: 'wait', reason: `anchor moved ${age}s ago` }, since);
   }
   return done({ kind: 'poke' }, since);
+}
+
+/** Tell a person what the cost gate is doing, since a pool cannot see it. */
+function gateAlerts(s: AssetState, gate: GateConfig, now: number, alerts: Alert[]) {
+  const status = gateStatus(gate, s.evidence, now);
+  if (!status.fresh) {
+    alerts.push({
+      severity: 'warn',
+      code: 'evidence-stale',
+      message: s.evidence
+        ? `market evidence is ${Math.round((now - s.evidence.timestamp) / 60)} min old (limit ${Math.round(gate.maxEvidenceAge / 60)} min): the oracle is on its tight rate`
+        : 'no market evidence has been published: the oracle is on its tight rate',
+    });
+    return;
+  }
+  const e = s.evidence!;
+  const d = s.decimals ?? 7;
+  const policy = s.policy;
+  const bounded = (rate: number | undefined) => rate !== undefined && rate !== UNBOUNDED;
+  if (!status.upKeepsPolicyRate && bounded(policy?.upBpsPerHour)) {
+    alerts.push({
+      severity: 'warn',
+      code: 'gate-tight',
+      message: `pushing the price up costs ${describeAmount(e.upCost, d)} against ${describeAmount(e.upExposure, d)} that it would unlock: upward moves are on the tight rate (${gate.tightUpBpsPerHour} bps/h)`,
+    });
+  }
+  if (!status.downKeepsPolicyRate && bounded(policy?.downBpsPerHour)) {
+    alerts.push({
+      severity: 'warn',
+      code: 'gate-tight',
+      message: `pushing the price down costs ${describeAmount(e.downCost, d)} against ${describeAmount(e.downExposure, d)} that it would unlock: downward moves are on the tight rate (${gate.tightDownBpsPerHour} bps/h)`,
+    });
+  }
 }
