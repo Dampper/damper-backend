@@ -1,0 +1,6 @@
+# Default reviewer for everything
+*                          @MubyLateef
+
+# The keeper signs transactions, so it gets a maintainer review
+/src/keeper/            @MubyLateef
+/.github/                  @MubyLateef

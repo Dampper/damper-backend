@@ -1,0 +1,9 @@
+# Decision records
+
+Short notes on why the backend is built the way it is.
+
+| # | Decision | Status |
+| --- | --- | --- |
+| [0001](0001-pool-registry-file.md) | Keep a persisted pool registry | Accepted |
+| [0002](0002-score-by-capital-to-clear-the-book.md) | Score exposure against the capital needed to clear the order book | Accepted |
+| [0003](0003-keeper-holds-on-suspicious-moves.md) | The keeper holds pokes on suspicious moves | Accepted |

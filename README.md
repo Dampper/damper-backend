@@ -1,6 +1,19 @@
-# Damper — backend
+<p align="center">
+  <img src="https://raw.githubusercontent.com/UbsOrg/.github/main/profile/damper-wordmark.png" alt="Damper" width="420">
+</p>
+
+# Damper Backend
+
+[![CI](https://github.com/UbsOrg/damper-backend/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/UbsOrg/damper-backend/actions/workflows/ci.yml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE) ![Stellar](https://img.shields.io/badge/network-Stellar-informational)
 
 Off-chain services for [Damper](https://github.com/UbsOrg/damper-contracts), a manipulation-resistant price oracle for Blend lending pools on Stellar.
+
+More documentation:
+
+- [Architecture](docs/ARCHITECTURE.md): the scanner and keeper pipelines
+- [Environment](docs/ENVIRONMENT.md): variables and commands
+- [Decision records](docs/adr/README.md): why it is built this way
+- [Roadmap](ROADMAP.md) and [changelog](CHANGELOG.md)
 
 ## Pool scanner
 
