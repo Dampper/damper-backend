@@ -6,24 +6,46 @@ import { fixedExposure, poolExposure } from '../keeper/market-evidence.js';
 import { Heartbeat } from '../keeper/heartbeat.js';
 import { NOTIFY_DEFAULTS, Notifier, parseWebhookUrl, type WebhookFormat } from '../keeper/notify.js';
 
-const { values } = parseArgs({
+const { values: flags } = parseArgs({
   options: {
     oracle: { type: 'string' },
-    network: { type: 'string', default: 'mainnet' },
+    network: { type: 'string' },
     rpc: { type: 'string' },
     once: { type: 'boolean', default: false },
-    interval: { type: 'string', default: '300' },
+    interval: { type: 'string' },
     submit: { type: 'boolean', default: false },
     pool: { type: 'string' },
     'exposure-usd': { type: 'string' },
     'market-horizon': { type: 'string' },
-    'webhook-format': { type: 'string', default: 'json' },
-    'alert-min': { type: 'string', default: 'warn' },
-    'alert-reminder-hours': { type: 'string', default: '6' },
+    'webhook-format': { type: 'string' },
+    'alert-min': { type: 'string' },
+    'alert-reminder-hours': { type: 'string' },
     'test-alert': { type: 'boolean', default: false },
     'test-heartbeat': { type: 'boolean', default: false },
   },
 });
+
+/**
+ * Every setting below a CLI flag can also come from an environment variable, so a host that
+ * only offers an env var editor (Render, and similar container platforms) needs no
+ * constructed argument string. A flag given on the command line always wins.
+ */
+const env = (name: string) => process.env[name] || undefined;
+const truthyEnv = (name: string) => ['1', 'true', 'yes'].includes((process.env[name] ?? '').toLowerCase());
+
+const values = {
+  ...flags,
+  oracle: flags.oracle ?? env('DAMPER_ORACLE'),
+  network: flags.network ?? env('DAMPER_NETWORK') ?? 'mainnet',
+  interval: flags.interval ?? env('DAMPER_INTERVAL') ?? '300',
+  submit: flags.submit || truthyEnv('DAMPER_SUBMIT'),
+  pool: flags.pool ?? env('DAMPER_POOL'),
+  'exposure-usd': flags['exposure-usd'] ?? env('DAMPER_EXPOSURE_USD'),
+  'market-horizon': flags['market-horizon'] ?? env('DAMPER_MARKET_HORIZON'),
+  'webhook-format': flags['webhook-format'] ?? env('DAMPER_WEBHOOK_FORMAT') ?? 'json',
+  'alert-min': flags['alert-min'] ?? env('DAMPER_ALERT_MIN') ?? 'warn',
+  'alert-reminder-hours': flags['alert-reminder-hours'] ?? env('DAMPER_ALERT_REMINDER_HOURS') ?? '6',
+};
 
 const TESTNET: Network = {
   rpc: 'https://soroban-testnet.stellar.org',
@@ -51,7 +73,7 @@ function printReport(r: TickReport) {
 }
 
 async function main() {
-  if (!values.oracle) throw new Error('--oracle <contract id> is required');
+  if (!values.oracle) throw new Error('--oracle <contract id> (or DAMPER_ORACLE) is required');
   const base = values.network === 'testnet' ? TESTNET : MAINNET;
   const network = values.rpc ? { ...base, rpc: values.rpc } : base;
 

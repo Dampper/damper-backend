@@ -6,7 +6,24 @@
 | `DAMPER_HORIZON_URL` | scanner | `https://horizon.stellar.org` | Horizon endpoint for SDEX order books and trade volume |
 | `DAMPER_ALERT_WEBHOOK` | keeper | none | Where alerts are posted: a Slack, Discord or generic webhook URL. A secret: anyone holding it can post to the channel. https only (plain http is accepted for localhost, to test a receiver). Without it, alerts only go to the log. |
 | `DAMPER_HEARTBEAT_URL` | keeper | none | A monitor's ping URL (healthchecks.io, Uptime Kuma, Cronitor, ...). Requested with `GET` after each healthy pass, so the monitor alerts when pings stop. A secret: whoever has it can mark the keeper alive. https only (http for localhost). Without it a dead keeper goes unnoticed. |
-| `DAMPER_KEEPER_SECRET` | keeper, with `--submit` | none | The keeper's secret key (`S...`). Read only from the environment, never printed. Must be the oracle's keeper address. |
+| `DAMPER_KEEPER_SECRET` | keeper, with `--submit`/`DAMPER_SUBMIT` | none | The keeper's secret key (`S...`). Read only from the environment, never printed. Must be the oracle's keeper address. |
+
+Every other keeper flag also has an environment-variable form, read when the flag is not given, so a host that only offers an env var editor (Render, and similar) needs no constructed argument string:
+
+| Variable | Same as | Default |
+| --- | --- | --- |
+| `DAMPER_ORACLE` | `--oracle` | required |
+| `DAMPER_NETWORK` | `--network` | `mainnet` |
+| `DAMPER_INTERVAL` | `--interval` | `300` |
+| `DAMPER_SUBMIT` | `--submit` | `false` (`1`/`true`/`yes` turn it on) |
+| `DAMPER_POOL` | `--pool` | none |
+| `DAMPER_EXPOSURE_USD` | `--exposure-usd` | none |
+| `DAMPER_MARKET_HORIZON` | `--market-horizon` | none |
+| `DAMPER_WEBHOOK_FORMAT` | `--webhook-format` | `json` |
+| `DAMPER_ALERT_MIN` | `--alert-min` | `warn` |
+| `DAMPER_ALERT_REMINDER_HOURS` | `--alert-reminder-hours` | `6` |
+
+A flag given on the command line always wins over its environment variable.
 
 Node 20 or newer.
 
@@ -33,6 +50,12 @@ npm run keeper -- --oracle C... [--network mainnet|testnet] [--rpc URL] [--once]
 ## Published report
 
 [`publish-report.yml`](../.github/workflows/publish-report.yml) scans every 6 hours and force-pushes a single commit to the `reports` branch containing `latest.json` (the scan) and `pools.json` (the registry). The dashboard reads `https://raw.githubusercontent.com/Dampper/damper-backend/reports/latest.json`. The workflow refuses to publish a report with no pools.
+
+## Deploying the keeper
+
+[`render.yaml`](../render.yaml) runs the keeper as a Render Background Worker: no public port, restarted on crash, which fits a process that only ever submits transactions and pings a monitor. In the Render dashboard, "New +" → "Blueprint", point it at this repository, then fill in the env vars it asks for (`DAMPER_ORACLE` at minimum; the rest turn on submitting, evidence, alerts and the heartbeat). The scheduled scan-and-publish workflow is unrelated and keeps running on GitHub Actions.
+
+Start with `DAMPER_SUBMIT=false` (the blueprint's default): the keeper still reports, alerts and pings the heartbeat, so you can watch a new oracle before handing it a funded key.
 
 ## Notes
 

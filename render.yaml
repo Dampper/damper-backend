@@ -1,0 +1,49 @@
+## Render blueprint: the keeper as a background worker.
+##
+## A Background Worker has no public port and restarts on crash, which fits a process that
+## only ever pushes transactions and pings a monitor. It replaces the old plan of running the
+## keeper under a supervisor somewhere; the GitHub Actions scan-and-publish workflow is
+## separate and keeps running on its own schedule.
+##
+## Deploy: in the Render dashboard, "New +" -> "Blueprint", point it at this repository. Then
+## fill in the env vars marked `sync: false` below (Render prompts for each one and never
+## shows them again). DAMPER_ORACLE is the only one required for a dry run; the rest turn on
+## submitting transactions, market evidence, alerts and the heartbeat.
+services:
+  - type: worker
+    name: damper-keeper
+    runtime: node
+    plan: starter
+    region: oregon
+    buildCommand: npm ci && npm run build
+    startCommand: node dist/cli/keeper.js
+    autoDeploy: true
+    envVars:
+      - key: NODE_OPTIONS
+        value: --dns-result-order=ipv4first
+      - key: DAMPER_ORACLE
+        sync: false
+      - key: DAMPER_NETWORK
+        value: mainnet
+      - key: DAMPER_INTERVAL
+        value: '300'
+      # Leave DAMPER_SUBMIT unset (or "false") to run as a dry-run reporter first; a dry run
+      # still pings the heartbeat and sends alerts, so it is a safe way to watch an oracle
+      # before handing the keeper a funded key.
+      - key: DAMPER_SUBMIT
+        value: 'false'
+      - key: DAMPER_KEEPER_SECRET
+        sync: false
+      # Market evidence for the cost gate: set at most one of these.
+      - key: DAMPER_POOL
+        sync: false
+      - key: DAMPER_EXPOSURE_USD
+        sync: false
+      - key: DAMPER_ALERT_WEBHOOK
+        sync: false
+      - key: DAMPER_WEBHOOK_FORMAT
+        value: json
+      - key: DAMPER_ALERT_MIN
+        value: warn
+      - key: DAMPER_HEARTBEAT_URL
+        sync: false

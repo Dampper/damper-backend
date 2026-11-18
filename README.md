@@ -109,6 +109,10 @@ A new alert is sent once, one that persists is mentioned again after the reminde
 
 A keeper that dies outright cannot announce it, so it pings an external monitor after each healthy pass (`DAMPER_HEARTBEAT_URL`, for example a healthchecks.io check). The monitor alerts when the pings stop, which covers a crash, a hang and a lost host. A pass that failed does not ping. See [decision record 0006](docs/adr/0006-heartbeat.md).
 
+## Running the keeper on Render
+
+[`render.yaml`](render.yaml) deploys the keeper as a Render Background Worker (no public port, restarted on crash). Every CLI flag above also reads from an environment variable of the same shape (`DAMPER_ORACLE`, `DAMPER_SUBMIT`, ...), so the whole thing is configured from Render's env var editor with no constructed argument string — see [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md). The scheduled scan-and-publish workflow above is separate and keeps running on GitHub Actions either way.
+
 ## Development
 
 ```sh
