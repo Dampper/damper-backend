@@ -6,6 +6,7 @@ import { fixedExposure, poolExposure } from '../keeper/market-evidence.js';
 import { Heartbeat } from '../keeper/heartbeat.js';
 import { NOTIFY_DEFAULTS, Notifier, parseWebhookUrl, type WebhookFormat } from '../keeper/notify.js';
 import { loadState, saveState, toMap } from '../keeper/state.js';
+import { writeFile } from 'node:fs/promises';
 
 const { values: flags } = parseArgs({
   options: {
@@ -24,6 +25,7 @@ const { values: flags } = parseArgs({
     'test-alert': { type: 'boolean', default: false },
     'test-heartbeat': { type: 'boolean', default: false },
     state: { type: 'string' },
+    'status-file': { type: 'string' },
   },
 });
 
@@ -48,6 +50,7 @@ const values = {
   'alert-min': flags['alert-min'] ?? env('DAMPER_ALERT_MIN') ?? 'warn',
   'alert-reminder-hours': flags['alert-reminder-hours'] ?? env('DAMPER_ALERT_REMINDER_HOURS') ?? '6',
   state: flags.state ?? env('DAMPER_STATE_FILE'),
+  'status-file': flags['status-file'] ?? env('DAMPER_STATUS_FILE'),
 };
 
 const TESTNET: Network = {
@@ -164,6 +167,11 @@ async function main() {
     }
     await notifier?.afterPass(report, failure, Math.floor(Date.now() / 1000));
     await heartbeat?.afterPass(report, failure);
+    if (values['status-file'] && report?.status) {
+      await writeFile(values['status-file'], JSON.stringify(report.status, null, 2) + '\n').catch((e) =>
+        console.error(`could not write --status-file: ${(e as Error).message}`),
+      );
+    }
     if (values.state) {
       await saveState(values.state, suspicious).catch((e) => console.error(`could not save --state: ${(e as Error).message}`));
     }

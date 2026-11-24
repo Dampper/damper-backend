@@ -27,6 +27,8 @@ A flag given on the command line always wins over its environment variable.
 
 `--state <path>` (or `DAMPER_STATE_FILE`) persists the suspicious-move hold clock to a JSON file, read at the start of a pass and written at the end. A long-running keeper does not need it — the clock already lives in memory for as long as the process does. A keeper that restarts every pass does: without it, a hold could never expire (see [ADR 0008](adr/0008-github-actions-keeper.md)).
 
+`--status-file <path>` (or `DAMPER_STATUS_FILE`) writes what the oracle reports for every asset after each pass — raw price, quote, anchor and its age, the policy, the effective policy after the gate, the evidence, and this pass's alerts — as JSON. It is how the oracle's state reaches the dashboard's status page without the dashboard reading the chain itself (see [ADR 0009](adr/0009-oracle-status-report.md)).
+
 Node 20 or newer.
 
 ## Commands

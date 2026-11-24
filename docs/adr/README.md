@@ -12,3 +12,4 @@ Short notes on why the backend is built the way it is.
 | [0006](0006-heartbeat.md) | A heartbeat so a dead keeper is noticed | Accepted |
 | [0007](0007-render-worker.md) | Run the keeper as a Render Background Worker, configured entirely by environment | Superseded by 0008 |
 | [0008](0008-github-actions-keeper.md) | Run the keeper on a GitHub Actions schedule, with its hold-state persisted | Accepted |
+| [0009](0009-oracle-status-report.md) | The keeper publishes a per-asset status report | Accepted |

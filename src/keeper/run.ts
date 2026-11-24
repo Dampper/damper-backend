@@ -5,6 +5,7 @@ import { DEFAULTS, decide, type Alert, type Options } from './decide.js';
 import { readOracle, submitEvidence, submitPoke } from './chain.js';
 import { buildEvidence, describeAmount, shouldPublish } from './evidence.js';
 import { depthFor, type ExposureSource } from './market-evidence.js';
+import { assetStatus, buildStatusReport, type StatusReport } from './status.js';
 
 export interface KeeperConfig {
   network: Network;
@@ -26,6 +27,8 @@ export interface KeeperConfig {
 
 export interface TickReport {
   at: number;
+  /** What the oracle reports for every asset right now, for a status page. Omitted when the pass itself failed before reading the oracle. */
+  status?: StatusReport;
   rows: {
     asset: string;
     action: string;
@@ -50,6 +53,7 @@ export async function tick(
   const { keeper, decimals, states } = await readOracle(view, cfg.oracle);
   const exposure = cfg.evidence && states.some((x) => x.state.gate) ? await cfg.evidence.exposure() : undefined;
   const report: TickReport = { at: now, rows: [] };
+  const statuses: ReturnType<typeof assetStatus>[] = [];
 
   if (cfg.signer && cfg.signer.publicKey() !== keeper) {
     throw new Error(
@@ -95,7 +99,10 @@ export async function tick(
       }
     }
     report.rows.push(row);
+    statuses.push(assetStatus(state, d.alerts));
   }
+  const networkLabel = cfg.network.passphrase.includes('Test') ? 'testnet' : 'mainnet';
+  report.status = buildStatusReport(networkLabel, cfg.oracle, statuses, now);
   return report;
 }
 

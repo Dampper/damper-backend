@@ -5,6 +5,10 @@ name: Keeper
 # suspicious" clock (ADR 0003 in the keeper) is persisted on its own branch and restored
 # before each pass. GitHub may delay or occasionally skip a scheduled run under load; the
 # heartbeat below is what actually notices if runs stop happening.
+#
+# The same branch also carries the oracle's status after each pass (--status-file), which
+# damper-frontend's status page reads, the same way damper-backend's own report reads
+# `reports`. See ADR 0009.
 
 on:
   schedule:
@@ -50,9 +54,9 @@ jobs:
           DAMPER_KEEPER_SECRET: ${{ secrets.DAMPER_KEEPER_SECRET }}
           DAMPER_ALERT_WEBHOOK: ${{ secrets.DAMPER_ALERT_WEBHOOK }}
           DAMPER_HEARTBEAT_URL: ${{ secrets.DAMPER_HEARTBEAT_URL }}
-        run: npm run keeper -- --once --state data/keeper-state.json
+        run: npm run keeper -- --once --state data/keeper-state.json --status-file data/oracle-status.json
 
-      - name: Publish the suspicious-move clock for the next pass
+      - name: Publish the suspicious-move clock and the oracle's status for the next pass and the dashboard
         if: always()
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -60,6 +64,11 @@ jobs:
           mkdir publish
           cp data/keeper-state.json publish/keeper-state.json 2>/dev/null \
             || echo '{"updatedAt":"1970-01-01T00:00:00.000Z","suspicious":{}}' > publish/keeper-state.json
+          # No status file means the pass failed before it could read the oracle; publishing
+          # nothing would leave the dashboard showing a stale report with no sign it is stale,
+          # so an empty, clearly-timestamped one is published instead.
+          cp data/oracle-status.json publish/oracle-status.json 2>/dev/null \
+            || echo "{\"at\":$(date -u +%s),\"network\":\"${{ vars.DAMPER_NETWORK || 'mainnet' }}\",\"oracle\":\"${{ vars.DAMPER_ORACLE }}\",\"assets\":[]}" > publish/oracle-status.json
           cd publish
           git init -q -b keeper-state
           git config user.name "github-actions[bot]"

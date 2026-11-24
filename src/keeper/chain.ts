@@ -55,8 +55,9 @@ export async function readOracle(view: ViewClient, oracle: string) {
     // A read that fails must fail the pass. Swallowing the error would make a gated asset look
     // ungated and silently drop its alerts. Transport errors are retried; a contract error is not.
     const read = <T>(method: string) => withRetry(() => view.call<T | null>(oracle, method, arg));
-    const [policy, anchor, raw, quote, gate, evidence] = await Promise.all([
+    const [policy, effectivePolicy, anchor, raw, quote, gate, evidence] = await Promise.all([
       read<RawPolicy>('policy'),
+      read<RawPolicy>('effective_policy'),
       read<RawAnchor>('anchor'),
       read<RawPrice>('raw_price'),
       read<RawPrice>('lastprice'),
@@ -73,6 +74,13 @@ export async function readOracle(view: ViewClient, oracle: string) {
               upBpsPerHour: policy.up_bps_per_hour,
               downBpsPerHour: policy.down_bps_per_hour,
               windowSecs: Number(policy.window_secs),
+            }
+          : undefined,
+        effectivePolicy: effectivePolicy
+          ? {
+              upBpsPerHour: effectivePolicy.up_bps_per_hour,
+              downBpsPerHour: effectivePolicy.down_bps_per_hour,
+              windowSecs: Number(effectivePolicy.window_secs),
             }
           : undefined,
         anchor: anchor ? { price: anchor.price, timestamp: Number(anchor.timestamp) } : undefined,

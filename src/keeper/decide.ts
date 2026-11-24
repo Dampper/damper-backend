@@ -16,6 +16,8 @@ export const MIN_POKE_SECS = 300;
 export interface AssetState {
   asset: string;
   policy: { upBpsPerHour: number; downBpsPerHour: number; windowSecs: number } | undefined;
+  /** The policy actually in force right now, after the gate. Same shape as `policy`. */
+  effectivePolicy?: { upBpsPerHour: number; downBpsPerHour: number; windowSecs: number };
   anchor: { price: bigint; timestamp: number } | undefined;
   /** Median of the upstream feeds before any clamp. */
   raw: bigint | undefined;

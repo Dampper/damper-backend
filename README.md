@@ -109,6 +109,8 @@ A new alert is sent once, one that persists is mentioned again after the reminde
 
 A keeper that dies outright cannot announce it, so it pings an external monitor after each healthy pass (`DAMPER_HEARTBEAT_URL`, for example a healthchecks.io check). The monitor alerts when the pings stop, which covers a crash, a hang and a lost host. A pass that failed does not ping. See [decision record 0006](docs/adr/0006-heartbeat.md).
 
+`--status-file` writes a JSON snapshot of every asset's raw price, quote, anchor, policy, effective policy, evidence and alerts after each pass — the keeper is the only thing that can see a clamp binding or an anchor going stale, so the dashboard's status page reads this rather than the chain. See [decision record 0009](docs/adr/0009-oracle-status-report.md).
+
 ## Running the keeper
 
 [`keeper.yml`](.github/workflows/keeper.yml) runs one keeper pass every 5 minutes on GitHub Actions — free for a public repository. Every CLI flag above also reads from an environment variable of the same shape (`DAMPER_ORACLE`, `DAMPER_SUBMIT`, ...), set as repository variables and secrets rather than built into an argument string; see [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md). Because each run is a fresh process, the "how long has this move looked suspicious" clock (ADR 0003) is persisted to its own `keeper-state` branch between runs instead of living in memory — see [decision record 0008](docs/adr/0008-github-actions-keeper.md).
