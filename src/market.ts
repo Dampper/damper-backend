@@ -19,6 +19,14 @@ export interface OrderBook {
   asks: Level[];
   /** Offers buying the asset with USDC, best (highest) first. amount is in USDC. */
   bids: Level[];
+  /**
+   * True when Horizon returned exactly its 200-level page limit on that side, so levels
+   * beyond the 200th (if any) are invisible (#20). A book with fewer than 200 real levels on
+   * a side is never flagged: this can only be a false positive (a book of exactly 200 real
+   * levels misread as truncated), never a false negative.
+   */
+  asksTruncated?: boolean;
+  bidsTruncated?: boolean;
 }
 
 export function midPrice(book: OrderBook): number | undefined {
@@ -57,11 +65,38 @@ export interface Depth {
   /** Value sold to make the feed see 0.5x and 0.1x the mid price. */
   down2x: number;
   down10x: number;
+  /**
+   * True when Horizon's 200-level page limit (#20) may be hiding asks/bids beyond what was
+   * read, so up2x/up10x/up100x (down2x/down10x) are a lower bound on the real cost rather
+   * than the real cost itself. Always false for a book Horizon returned in full.
+   */
+  upIsLowerBound: boolean;
+  downIsLowerBound: boolean;
+}
+
+/**
+ * True once the book's ask side is both possibly-truncated and does not visibly clear up to
+ * `target` within the levels actually returned — the only case where a truncated 200-level
+ * page can make the reported cost understated (#20). Reported costs are reads of a prefix of
+ * the book (every ask strictly below the target); a page cut off beyond where the prefix
+ * ends cannot change that prefix's sum, so a truncated page below the target it reached is
+ * not flagged.
+ */
+function asksMayUnderstate(book: OrderBook, target: number): boolean {
+  if (!book.asksTruncated) return false;
+  const last = book.asks.at(-1);
+  return last === undefined || last.price < target;
+}
+
+function bidsMayUnderstate(book: OrderBook, target: number): boolean {
+  if (!book.bidsTruncated) return false;
+  const last = book.bids.at(-1);
+  return last === undefined || last.price > target;
 }
 
 export function depth(book: OrderBook): Depth {
   const mid = midPrice(book);
-  if (mid === undefined) return { mid, up2x: 0, up10x: 0, up100x: 0, down2x: 0, down10x: 0 };
+  if (mid === undefined) return { mid, up2x: 0, up10x: 0, up100x: 0, down2x: 0, down10x: 0, upIsLowerBound: false, downIsLowerBound: false };
   return {
     mid,
     up2x: usdcToPushUp(book, mid * 2),
@@ -69,6 +104,11 @@ export function depth(book: OrderBook): Depth {
     up100x: usdcToPushUp(book, mid * 100),
     down2x: usdcToPushDown(book, mid / 2, mid),
     down10x: usdcToPushDown(book, mid / 10, mid),
+    // The widest target (100x / 0.1x) is the one most likely to run off the end of a
+    // truncated page; flagging it covers up2x/up10x (down2x/down10x) too, since they ask for
+    // less and so can only be truncation-affected when the wider target already is.
+    upIsLowerBound: asksMayUnderstate(book, mid * 100),
+    downIsLowerBound: bidsMayUnderstate(book, mid / 10),
   };
 }
 
@@ -96,15 +136,20 @@ async function horizon<T>(base: string, path: string, params: Record<string, str
 }
 
 /** SDEX order book for `asset` quoted in `quote`. */
+/** Horizon's own page cap: the most order-book levels one request can return. */
+export const ORDER_BOOK_PAGE_LIMIT = 200;
+
 export async function fetchOrderBook(horizonUrl: string, asset: ClassicAsset, quote: ClassicAsset): Promise<OrderBook> {
   const raw = await horizon<{ asks: { price: string; amount: string }[]; bids: { price: string; amount: string }[] }>(
     horizonUrl,
     '/order_book',
-    { ...assetParams('selling', asset), ...assetParams('buying', quote), limit: '200' },
+    { ...assetParams('selling', asset), ...assetParams('buying', quote), limit: String(ORDER_BOOK_PAGE_LIMIT) },
   );
   return {
     asks: raw.asks.map((l) => ({ price: Number(l.price), amount: Number(l.amount) })),
     bids: raw.bids.map((l) => ({ price: Number(l.price), amount: Number(l.amount) })),
+    asksTruncated: raw.asks.length === ORDER_BOOK_PAGE_LIMIT,
+    bidsTruncated: raw.bids.length === ORDER_BOOK_PAGE_LIMIT,
   };
 }
 
