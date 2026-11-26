@@ -88,10 +88,37 @@ function assetParams(prefix: 'selling' | 'buying' | 'base' | 'counter', a: Class
   };
 }
 
+/** `Retry-After` as milliseconds: a delta-seconds value, or an HTTP-date. undefined if absent or unreadable. */
+function retryAfterMs(header: string | null): number | undefined {
+  if (!header) return undefined;
+  const seconds = Number(header);
+  if (Number.isFinite(seconds) && seconds >= 0) return seconds * 1000;
+  const at = Date.parse(header);
+  return Number.isNaN(at) ? undefined : Math.max(0, at - Date.now());
+}
+
+/**
+ * Thrown by `horizon()`; `retryAfterMs`, from a 429's `Retry-After` header, lets
+ * `withRetry` (scan.ts) honour the server's own wait instead of guessing at one. Not
+ * imported as `scan.ts`'s `RetryableError` type to avoid a circular import between the
+ * two modules — the shape (`retryAfterMs?: number` on an `Error`) is duck-typed instead.
+ */
+export class HorizonError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly retryAfterMs?: number,
+  ) {
+    super(message);
+  }
+}
+
 async function horizon<T>(base: string, path: string, params: Record<string, string>): Promise<T> {
   const url = `${base}${path}?${new URLSearchParams(params)}`;
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`horizon ${path} ${res.status}`);
+  if (!res.ok) {
+    throw new HorizonError(`horizon ${path} ${res.status}`, res.status, res.status === 429 ? retryAfterMs(res.headers.get('retry-after')) : undefined);
+  }
   return (await res.json()) as T;
 }
 

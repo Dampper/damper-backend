@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { depth, midPrice, usdcToPushDown, usdcToPushUp, type OrderBook } from '../src/market.js';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { depth, fetchOrderBook, HorizonError, midPrice, usdcToPushDown, usdcToPushUp, type OrderBook } from '../src/market.js';
 import { parseSacName } from '../src/assets.js';
 
 // Shape of the USTRY/USDC book read from Horizon on 2026-11-17: a market maker
@@ -69,5 +69,57 @@ describe('SAC names', () => {
   it('rejects custom token names', () => {
     expect(parseSacName('Blend Token')).toBeUndefined();
     expect(parseSacName('')).toBeUndefined();
+  });
+});
+
+describe('Horizon Retry-After (#19)', () => {
+  const asset = { code: 'USTRY', issuer: 'GCRYUGD5NVARGXT56XEZI5CIFCQETYHAPQQTHO2O3IQZTHDH4LATMYWC' };
+  const quote = { code: 'USDC', issuer: 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN' };
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('carries a 429 Retry-After (seconds) through as retryAfterMs', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('rate limited', { status: 429, headers: { 'retry-after': '7' } })),
+    );
+
+    const error = await fetchOrderBook('https://horizon.example', asset, quote).catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(HorizonError);
+    expect((error as HorizonError).status).toBe(429);
+    expect((error as HorizonError).retryAfterMs).toBe(7_000);
+  });
+
+  it('reads an HTTP-date Retry-After as the delay until that instant', async () => {
+    const at = new Date(Date.now() + 15_000).toUTCString();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('rate limited', { status: 429, headers: { 'retry-after': at } })),
+    );
+
+    const error = (await fetchOrderBook('https://horizon.example', asset, quote).catch((e: unknown) => e)) as HorizonError;
+
+    expect(error.retryAfterMs).toBeGreaterThan(10_000);
+    expect(error.retryAfterMs).toBeLessThanOrEqual(15_000);
+  });
+
+  it('leaves retryAfterMs undefined without the header, and never reads it for other statuses', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('rate limited', { status: 429 })),
+    );
+    const noHeader = (await fetchOrderBook('https://horizon.example', asset, quote).catch((e: unknown) => e)) as HorizonError;
+    expect(noHeader.retryAfterMs).toBeUndefined();
+
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('broken', { status: 500, headers: { 'retry-after': '7' } })),
+    );
+    const notRateLimited = (await fetchOrderBook('https://horizon.example', asset, quote).catch((e: unknown) => e)) as HorizonError;
+    expect(notRateLimited.status).toBe(500);
+    expect(notRateLimited.retryAfterMs).toBeUndefined();
   });
 });
