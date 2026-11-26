@@ -147,6 +147,18 @@ describe('messages', () => {
     const long: Notification = { kind: 'new', alert: { ...alert('x'), message: 'y'.repeat(5000) }, firedFor: 0 };
     expect((buildPayload('discord', long, ctx, NOW).content as string).length).toBeLessThanOrEqual(1900);
   });
+
+  it('builds a Telegram sendMessage payload with chat_id from context and the same text', () => {
+    const withChat = { ...ctx, telegramChatId: '-100123456789' };
+    const payload = buildPayload('telegram', n('new'), withChat, NOW);
+    expect(payload).toEqual({ chat_id: '-100123456789', text: formatText(n('new'), withChat) });
+  });
+
+  it('keeps a Telegram message under its 4096-character limit', () => {
+    const withChat = { ...ctx, telegramChatId: '-100123456789' };
+    const long: Notification = { kind: 'new', alert: { ...alert('x'), message: 'y'.repeat(5000) }, firedFor: 0 };
+    expect((buildPayload('telegram', long, withChat, NOW).text as string).length).toBeLessThanOrEqual(4096);
+  });
 });
 
 describe('parseWebhookUrl', () => {

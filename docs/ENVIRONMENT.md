@@ -5,6 +5,7 @@
 | `DAMPER_RPC_URL` | scanner, keeper | `https://mainnet.sorobanrpc.com` | Soroban RPC endpoint. The keeper's `--network testnet` switches to the testnet RPC; `--rpc` overrides either. |
 | `DAMPER_HORIZON_URL` | scanner | `https://horizon.stellar.org` | Horizon endpoint for SDEX order books and trade volume |
 | `DAMPER_ALERT_WEBHOOK` | keeper | none | Where alerts are posted: a Slack, Discord or generic webhook URL. A secret: anyone holding it can post to the channel. https only (plain http is accepted for localhost, to test a receiver). Without it, alerts only go to the log. |
+| `DAMPER_TELEGRAM_CHAT_ID` | keeper, with `--webhook-format telegram` | none | Chat (or channel) id `sendMessage` posts to. `DAMPER_ALERT_WEBHOOK` is then the bot's `https://api.telegram.org/bot<token>/sendMessage` URL. Required when the format is `telegram`. |
 | `DAMPER_HEARTBEAT_URL` | keeper | none | A monitor's ping URL (healthchecks.io, Uptime Kuma, Cronitor, ...). Requested with `GET` after each healthy pass, so the monitor alerts when pings stop. A secret: whoever has it can mark the keeper alive. https only (http for localhost). Without it a dead keeper goes unnoticed. |
 | `DAMPER_KEEPER_SECRET` | keeper, with `--submit`/`DAMPER_SUBMIT` | none | The keeper's secret key (`S...`). Read only from the environment, never printed. Must be the oracle's keeper address. |
 
@@ -37,7 +38,7 @@ Node 20 or newer.
 npm run scan -- [--registry data/pools.json] [--out reports/latest.json] [--pool C... ...] [--merge-from URL|FILE]
 npm run keeper -- --oracle C... [--network mainnet|testnet] [--rpc URL] [--once] [--interval 300] [--submit]
                   [--pool C... | --exposure-usd N] [--market-horizon URL]
-                  [--webhook-format json|slack|discord] [--alert-min critical|warn|info]
+                  [--webhook-format json|slack|discord|telegram] [--alert-min critical|warn|info]
                   [--alert-reminder-hours 6] [--test-alert] [--test-heartbeat]
 ```
 

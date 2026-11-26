@@ -138,11 +138,13 @@ export function alertsFromReport(report: TickReport | undefined, consecutiveFail
 
 // ------------------------------------------------------------------ messages
 
-export type WebhookFormat = 'json' | 'slack' | 'discord';
+export type WebhookFormat = 'json' | 'slack' | 'discord' | 'telegram';
 
 export interface Context {
   network: string;
   oracle: string;
+  /** Telegram chat (or channel) id to post to; only read for `format: 'telegram'`. */
+  telegramChatId?: string;
 }
 
 const short = (s: string) => (s.length > 14 ? `${s.slice(0, 6)}…${s.slice(-4)}` : s);
@@ -168,6 +170,9 @@ export function buildPayload(format: WebhookFormat, n: Notification, ctx: Contex
   if (format === 'slack') return { text };
   // Discord rejects messages over 2000 characters
   if (format === 'discord') return { content: text.slice(0, 1900) };
+  // Telegram's sendMessage: chat_id identifies the chat/channel, text is the message
+  // (Bot API also caps messages at 4096 characters).
+  if (format === 'telegram') return { chat_id: ctx.telegramChatId, text: text.slice(0, 4096) };
   return {
     source: 'damper-keeper',
     kind: n.kind,
