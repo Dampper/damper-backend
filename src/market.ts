@@ -131,7 +131,9 @@ export function assetParams(prefix: 'selling' | 'buying' | 'base' | 'counter', a
 export async function horizon<T>(base: string, path: string, params: Record<string, string>): Promise<T> {
   const url = `${base}${path}?${new URLSearchParams(params)}`;
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`horizon ${path} ${res.status}`);
+  if (!res.ok) {
+    throw new HorizonError(`horizon ${path} ${res.status}`, res.status, res.status === 429 ? retryAfterMs(res.headers.get('retry-after')) : undefined);
+  }
   return (await res.json()) as T;
 }
 

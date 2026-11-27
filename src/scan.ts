@@ -61,8 +61,32 @@ const FIXED_7 = 1e7;
 /** Circle USDC's Stellar Asset Contract; the pools quote everything in it. */
 const USDC_SAC = 'CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75';
 
-/** Public RPC and Horizon endpoints drop the odd request; retry transport failures only. */
-export async function withRetry<T>(fn: () => Promise<T>, attempts = 5): Promise<T> {
+/** Longest a single retry waits on a server-given Retry-After, matching the cap `deliver` (notify.ts) uses for webhooks. */
+export const MAX_RETRY_AFTER_MS = 30_000;
+
+/**
+ * An error that names how long the server asked callers to wait before trying again
+ * (`retryAfterMs`), so a 429 can be honoured instead of guessed at. Thrown by the Horizon
+ * helper in `market.ts`; errors from other sources simply do not have this property.
+ */
+export interface RetryableError extends Error {
+  retryAfterMs?: number;
+}
+
+function hasRetryAfter(e: unknown): e is RetryableError {
+  return e instanceof Error && typeof (e as RetryableError).retryAfterMs === 'number';
+}
+
+/**
+ * Public RPC and Horizon endpoints drop the odd request; retry transport failures only.
+ * A 429 that carries a `Retry-After` (see `RetryableError`) waits exactly that long, capped
+ * at `MAX_RETRY_AFTER_MS`; everything else falls back to exponential backoff, as before.
+ */
+export async function withRetry<T>(
+  fn: () => Promise<T>,
+  attempts = 5,
+  sleep: (ms: number) => Promise<void> = (ms) => new Promise((r) => setTimeout(r, ms)),
+): Promise<T> {
   for (let i = 1; ; i++) {
     try {
       return await fn();
@@ -70,7 +94,8 @@ export async function withRetry<T>(fn: () => Promise<T>, attempts = 5): Promise<
       const msg = (e as Error).message ?? '';
       const transient = /fetch failed|ECONNRESET|ETIMEDOUT|socket|429|50[234]/.test(msg);
       if (!transient || i >= attempts) throw e;
-      await new Promise((r) => setTimeout(r, 1000 * 2 ** (i - 1)));
+      const wait = hasRetryAfter(e) ? Math.min(e.retryAfterMs!, MAX_RETRY_AFTER_MS) : 1000 * 2 ** (i - 1);
+      await sleep(wait);
     }
   }
 }

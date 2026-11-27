@@ -1,5 +1,4 @@
 import { Keypair } from '@stellar/stellar-sdk';
-import { parseArgs } from 'node:util';
 import { MAINNET, type Network } from '../config.js';
 import { tick, type TickReport } from '../keeper/run.js';
 import { fixedExposure, poolExposure } from '../keeper/market-evidence.js';
@@ -7,51 +6,13 @@ import { Heartbeat } from '../keeper/heartbeat.js';
 import { NOTIFY_DEFAULTS, Notifier, parseWebhookUrl, type WebhookFormat } from '../keeper/notify.js';
 import { emptyState, loadState, saveState, toMap, toNotifyState } from '../keeper/state.js';
 import { writeFile } from 'node:fs/promises';
+import { resolveConfig } from './keeperConfig.js';
 
-const { values: flags } = parseArgs({
-  options: {
-    oracle: { type: 'string' },
-    network: { type: 'string' },
-    rpc: { type: 'string' },
-    once: { type: 'boolean', default: false },
-    interval: { type: 'string' },
-    submit: { type: 'boolean', default: false },
-    pool: { type: 'string' },
-    'exposure-usd': { type: 'string' },
-    'market-horizon': { type: 'string' },
-    'webhook-format': { type: 'string' },
-    'alert-min': { type: 'string' },
-    'alert-reminder-hours': { type: 'string' },
-    'test-alert': { type: 'boolean', default: false },
-    'test-heartbeat': { type: 'boolean', default: false },
-    state: { type: 'string' },
-    'status-file': { type: 'string' },
-  },
-});
+const values = resolveConfig(process.argv.slice(2), process.env);
 
-/**
- * Every setting below a CLI flag can also come from an environment variable, so a host that
- * only offers an env var editor (Render, and similar container platforms) needs no
- * constructed argument string. A flag given on the command line always wins.
- */
+// The secret and the Telegram chat id are not ordinary flags (no `--secret`, read only from
+// the environment so they never show up in `ps`, logs or a saved command line).
 const env = (name: string) => process.env[name] || undefined;
-const truthyEnv = (name: string) => ['1', 'true', 'yes'].includes((process.env[name] ?? '').toLowerCase());
-
-const values = {
-  ...flags,
-  oracle: flags.oracle ?? env('DAMPER_ORACLE'),
-  network: flags.network ?? env('DAMPER_NETWORK') ?? 'mainnet',
-  interval: flags.interval ?? env('DAMPER_INTERVAL') ?? '300',
-  submit: flags.submit || truthyEnv('DAMPER_SUBMIT'),
-  pool: flags.pool ?? env('DAMPER_POOL'),
-  'exposure-usd': flags['exposure-usd'] ?? env('DAMPER_EXPOSURE_USD'),
-  'market-horizon': flags['market-horizon'] ?? env('DAMPER_MARKET_HORIZON'),
-  'webhook-format': flags['webhook-format'] ?? env('DAMPER_WEBHOOK_FORMAT') ?? 'json',
-  'alert-min': flags['alert-min'] ?? env('DAMPER_ALERT_MIN') ?? 'warn',
-  'alert-reminder-hours': flags['alert-reminder-hours'] ?? env('DAMPER_ALERT_REMINDER_HOURS') ?? '6',
-  state: flags.state ?? env('DAMPER_STATE_FILE'),
-  'status-file': flags['status-file'] ?? env('DAMPER_STATUS_FILE'),
-};
 
 const TESTNET: Network = {
   rpc: 'https://soroban-testnet.stellar.org',
@@ -111,13 +72,15 @@ async function main() {
   const hook = process.env.DAMPER_ALERT_WEBHOOK;
   if (hook) {
     const format = values['webhook-format'] as WebhookFormat;
-    if (!['json', 'slack', 'discord'].includes(format)) throw new Error('--webhook-format must be json, slack or discord');
+    if (!['json', 'slack', 'discord', 'telegram'].includes(format)) throw new Error('--webhook-format must be json, slack, discord or telegram');
     const min = values['alert-min'];
     if (min !== 'critical' && min !== 'warn' && min !== 'info') throw new Error('--alert-min must be critical, warn or info');
     const hours = Number(values['alert-reminder-hours']);
     if (!(hours > 0)) throw new Error('--alert-reminder-hours must be a positive number');
+    const telegramChatId = env('DAMPER_TELEGRAM_CHAT_ID');
+    if (format === 'telegram' && !telegramChatId) throw new Error('--webhook-format telegram needs DAMPER_TELEGRAM_CHAT_ID in the environment');
     const url = parseWebhookUrl(hook);
-    notifier = new Notifier(url, format, { network: values.network!, oracle: values.oracle }, { ...NOTIFY_DEFAULTS, minSeverity: min, reminderSecs: hours * 3600 });
+    notifier = new Notifier(url, format, { network: values.network!, oracle: values.oracle, telegramChatId }, { ...NOTIFY_DEFAULTS, minSeverity: min, reminderSecs: hours * 3600 });
     console.log(`alerts: ${min} and above go to ${url.host} (${format}), reminders every ${hours} h`);
   } else if (values['test-alert']) {
     throw new Error('--test-alert needs DAMPER_ALERT_WEBHOOK in the environment');
