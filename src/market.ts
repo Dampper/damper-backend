@@ -119,7 +119,7 @@ export interface ClassicAsset {
   issuer: string | undefined; // undefined for native XLM
 }
 
-function assetParams(prefix: 'selling' | 'buying' | 'base' | 'counter', a: ClassicAsset) {
+export function assetParams(prefix: 'selling' | 'buying' | 'base' | 'counter', a: ClassicAsset) {
   if (!a.issuer) return { [`${prefix}_asset_type`]: 'native' };
   return {
     [`${prefix}_asset_type`]: a.code.length <= 4 ? 'credit_alphanum4' : 'credit_alphanum12',
@@ -128,7 +128,7 @@ function assetParams(prefix: 'selling' | 'buying' | 'base' | 'counter', a: Class
   };
 }
 
-async function horizon<T>(base: string, path: string, params: Record<string, string>): Promise<T> {
+export async function horizon<T>(base: string, path: string, params: Record<string, string>): Promise<T> {
   const url = `${base}${path}?${new URLSearchParams(params)}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`horizon ${path} ${res.status}`);
