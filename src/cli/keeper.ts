@@ -4,7 +4,7 @@ import { tick, type TickReport } from '../keeper/run.js';
 import { fixedExposure, poolExposure } from '../keeper/market-evidence.js';
 import { Heartbeat } from '../keeper/heartbeat.js';
 import { NOTIFY_DEFAULTS, Notifier, parseWebhookUrl, type WebhookFormat } from '../keeper/notify.js';
-import { loadState, saveState, toMap } from '../keeper/state.js';
+import { emptyState, loadState, saveState, toMap, toNotifyState } from '../keeper/state.js';
 import { writeFile } from 'node:fs/promises';
 import { resolveConfig } from './keeperConfig.js';
 
@@ -115,7 +115,12 @@ async function main() {
   // long-running process keeps it for free; a process that restarts every pass (a scheduled
   // job, a crash) does not, so a hold could never expire without reading it back here (ADR
   // 0008). Without --state this is exactly the old in-memory-only behaviour.
-  const suspicious = values.state ? toMap(await loadState(values.state)) : new Map<string, number>();
+  const keeperState = values.state ? await loadState(values.state) : emptyState();
+  const suspicious = toMap(keeperState);
+  // ADR 0008 persisted the hold clock across restarts but missed the notifier's own state
+  // (#10): without this, a scheduled `--once` run tells a person about every still-firing
+  // alert on every pass instead of once plus a reminder.
+  if (notifier) for (const [key, tracked] of toNotifyState(keeperState)) notifier.state.set(key, tracked);
   const every = Math.max(60, Number(values.interval)) * 1000;
   for (;;) {
     let report: TickReport | undefined;
@@ -136,7 +141,7 @@ async function main() {
       );
     }
     if (values.state) {
-      await saveState(values.state, suspicious).catch((e) => console.error(`could not save --state: ${(e as Error).message}`));
+      await saveState(values.state, suspicious, notifier?.state).catch((e) => console.error(`could not save --state: ${(e as Error).message}`));
     }
     if (values.once) return;
     await new Promise((r) => setTimeout(r, every));

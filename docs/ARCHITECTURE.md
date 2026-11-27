@@ -42,3 +42,4 @@ Upstream feeds are classified by what is on-chain: the known Reflector DEX and C
 
 - `data/pools.json`: the pool registry, committed. Pools found only through events would otherwise be lost once the RPC forgets them.
 - `reports/`: scan output, not committed.
+- `schemas/`: hand-maintained JSON Schemas for `latest.json` (`ScanReport`, `src/scan.ts`) and `oracle-status.json` (`StatusReport`, `src/keeper/status.ts`), validated against the generated files in the publish-report and keeper workflows (`npm run validate-report`) so a drift from either TypeScript interface fails CI instead of only surfacing as a runtime parse error in damper-frontend. Published alongside each report.

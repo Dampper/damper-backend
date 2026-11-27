@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/Dampper/damper-backend/keeper-state/oracle-status.schema.json",
+  "title": "Damper oracle status report (oracle-status.json)",
+  "description": "The shape written by src/keeper/status.ts (StatusReport) via --status-file, and published to the `keeper-state` branch for damper-frontend's status page. Kept by hand next to the TypeScript interfaces it mirrors (#15).",
+  "type": "object",
+  "required": ["at", "network", "oracle", "assets"],
+  "additionalProperties": false,
+  "properties": {
+    "at": { "type": "integer", "minimum": 0 },
+    "network": { "type": "string" },
+    "oracle": { "type": "string" },
+    "assets": { "type": "array", "items": { "$ref": "#/definitions/assetStatus" } }
+  },
+  "definitions": {
+    "rate": {
+      "type": "object",
+      "required": ["upBpsPerHour", "downBpsPerHour", "windowSecs"],
+      "additionalProperties": false,
+      "properties": {
+        "upBpsPerHour": { "type": "number" },
+        "downBpsPerHour": { "type": "number" },
+        "windowSecs": { "type": "number", "minimum": 0 }
+      }
+    },
+    "assetStatus": {
+      "type": "object",
+      "required": ["asset", "alerts"],
+      "additionalProperties": false,
+      "properties": {
+        "asset": { "type": "string" },
+        "decimals": { "type": "number", "minimum": 0 },
+        "policy": { "$ref": "#/definitions/rate" },
+        "effectivePolicy": { "$ref": "#/definitions/rate" },
+        "gate": {
+          "type": "object",
+          "required": ["tightUpBpsPerHour", "tightDownBpsPerHour", "minCostRatioBps", "maxEvidenceAge"],
+          "additionalProperties": false,
+          "properties": {
+            "tightUpBpsPerHour": { "type": "number" },
+            "tightDownBpsPerHour": { "type": "number" },
+            "minCostRatioBps": { "type": "number" },
+            "maxEvidenceAge": { "type": "number", "minimum": 0 }
+          }
+        },
+        "anchor": {
+          "type": "object",
+          "required": ["price", "timestamp"],
+          "additionalProperties": false,
+          "properties": {
+            "price": { "type": "string" },
+            "timestamp": { "type": "number", "minimum": 0 }
+          }
+        },
+        "raw": { "type": "string" },
+        "quote": { "type": "string" },
+        "evidence": {
+          "type": "object",
+          "required": ["upCost", "upExposure", "downCost", "downExposure", "timestamp"],
+          "additionalProperties": false,
+          "properties": {
+            "upCost": { "type": "string" },
+            "upExposure": { "type": "string" },
+            "downCost": { "type": "string" },
+            "downExposure": { "type": "string" },
+            "timestamp": { "type": "number", "minimum": 0 }
+          }
+        },
+        "alerts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["severity", "code", "message"],
+            "additionalProperties": false,
+            "properties": {
+              "severity": { "enum": ["critical", "warn", "info"] },
+              "code": { "type": "string" },
+              "message": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

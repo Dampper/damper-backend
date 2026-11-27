@@ -16,6 +16,8 @@ The hold clock is given somewhere to live between runs: [`src/keeper/state.ts`](
 
 Without `--state` the keeper behaves exactly as before (in-memory only), so a long-running deployment (Render, or anywhere else) is unaffected by this change.
 
+**Update (#10):** the same file also carries the `Notifier`'s delivery state (which alerts a person has already been told about, and when) — missed in the original decision above. Without it, a scheduled `--once` run started with an empty `Notifier` on every pass, so `DAMPER_ALERT_WEBHOOK` posted every still-firing alert again each run instead of once plus a reminder every `--alert-reminder-hours`. `state.ts` now reads and writes both maps in the one JSON file, and `keeper.ts` hydrates the `Notifier` from it before the loop and saves its state back alongside the hold clock after each pass. Losing the file resets both clocks the same way: a held move looks freshly suspicious again, and an already-delivered alert may be sent one extra time — never unsafe, just occasionally noisier.
+
 ## Consequences
 
 - No hosting cost, but a weaker process: GitHub documents that a scheduled workflow can be delayed or occasionally skipped under load, so the keeper's real cadence is "about every 5 minutes," not exactly every 5 minutes. A late or dropped run only makes the clamp more cautious (an unpoked anchor widens the band more slowly), never less, so this fails toward safety rather than away from it.

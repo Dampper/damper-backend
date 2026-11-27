@@ -1,5 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { depth, fetchOrderBook, HorizonError, midPrice, usdcToPushDown, usdcToPushUp, type OrderBook } from '../src/market.js';
+import {
+  depth,
+  fetchOrderBook,
+  midPrice,
+  ORDER_BOOK_PAGE_LIMIT,
+  usdcToPushDown,
+  usdcToPushUp,
+  type OrderBook,
+} from '../src/market.js';
 import { parseSacName } from '../src/assets.js';
 
 // Shape of the USTRY/USDC book read from Horizon on 2026-11-17: a market maker
@@ -72,54 +80,85 @@ describe('SAC names', () => {
   });
 });
 
-describe('Horizon Retry-After (#19)', () => {
-  const asset = { code: 'USTRY', issuer: 'GCRYUGD5NVARGXT56XEZI5CIFCQETYHAPQQTHO2O3IQZTHDH4LATMYWC' };
-  const quote = { code: 'USDC', issuer: 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN' };
-
+describe('order book truncation at Horizon\'s 200-level limit (#20)', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
   });
 
-  it('carries a 429 Retry-After (seconds) through as retryAfterMs', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => new Response('rate limited', { status: 429, headers: { 'retry-after': '7' } })),
-    );
+  function levels(n: number, step = 0.01, from = 1): { price: string; amount: string }[] {
+    return Array.from({ length: n }, (_, i) => ({ price: (from + i * step).toFixed(6), amount: '100' }));
+  }
 
-    const error = await fetchOrderBook('https://horizon.example', asset, quote).catch((e: unknown) => e);
+  const asset = { code: 'USTRY', issuer: 'GCRYUGD5NVARGXT56XEZI5CIFCQETYHAPQQTHO2O3IQZTHDH4LATMYWC' };
+  const quote = { code: 'USDC', issuer: 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN' };
 
-    expect(error).toBeInstanceOf(HorizonError);
-    expect((error as HorizonError).status).toBe(429);
-    expect((error as HorizonError).retryAfterMs).toBe(7_000);
+  function mockHorizon(asks: { price: string; amount: string }[], bids: { price: string; amount: string }[]) {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({ asks, bids }), { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+    return fetchMock;
+  }
+
+  it('flags a side as truncated only when Horizon returns exactly the page limit', async () => {
+    mockHorizon(levels(ORDER_BOOK_PAGE_LIMIT), levels(ORDER_BOOK_PAGE_LIMIT, -0.01));
+    const full = await fetchOrderBook('https://horizon.example', asset, quote);
+    expect(full.asksTruncated).toBe(true);
+    expect(full.bidsTruncated).toBe(true);
+
+    mockHorizon(levels(ORDER_BOOK_PAGE_LIMIT - 1), levels(3, -0.01));
+    const partial = await fetchOrderBook('https://horizon.example', asset, quote);
+    expect(partial.asksTruncated).toBe(false);
+    expect(partial.bidsTruncated).toBe(false);
   });
 
-  it('reads an HTTP-date Retry-After as the delay until that instant', async () => {
-    const at = new Date(Date.now() + 15_000).toUTCString();
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => new Response('rate limited', { status: 429, headers: { 'retry-after': at } })),
-    );
-
-    const error = (await fetchOrderBook('https://horizon.example', asset, quote).catch((e: unknown) => e)) as HorizonError;
-
-    expect(error.retryAfterMs).toBeGreaterThan(10_000);
-    expect(error.retryAfterMs).toBeLessThanOrEqual(15_000);
+  it('requests exactly the page limit from Horizon', async () => {
+    const fetchMock = mockHorizon([], []);
+    await fetchOrderBook('https://horizon.example', asset, quote);
+    const url = new URL(fetchMock.mock.calls[0]![0] as string);
+    expect(url.searchParams.get('limit')).toBe(String(ORDER_BOOK_PAGE_LIMIT));
   });
 
-  it('leaves retryAfterMs undefined without the header, and never reads it for other statuses', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => new Response('rate limited', { status: 429 })),
-    );
-    const noHeader = (await fetchOrderBook('https://horizon.example', asset, quote).catch((e: unknown) => e)) as HorizonError;
-    expect(noHeader.retryAfterMs).toBeUndefined();
+  it('is not a lower bound when the book is small enough to be read in full', () => {
+    const small: OrderBook = { asks: [{ price: 2, amount: 1 }], bids: [{ price: 1, amount: 1 }] };
+    const d = depth(small);
+    expect(d.upIsLowerBound).toBe(false);
+    expect(d.downIsLowerBound).toBe(false);
+  });
 
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => new Response('broken', { status: 500, headers: { 'retry-after': '7' } })),
-    );
-    const notRateLimited = (await fetchOrderBook('https://horizon.example', asset, quote).catch((e: unknown) => e)) as HorizonError;
-    expect(notRateLimited.status).toBe(500);
-    expect(notRateLimited.retryAfterMs).toBeUndefined();
+  it('is a lower bound when the truncated side runs out before reaching the 100x/0.1x target', () => {
+    // mid = 1.5; 100x target = 150, 0.1x target = 0.15. These 200-level pages never get near either.
+    const truncated: OrderBook = {
+      asks: levels(ORDER_BOOK_PAGE_LIMIT, 0.001, 1).map((l) => ({ price: Number(l.price), amount: Number(l.amount) })),
+      bids: levels(ORDER_BOOK_PAGE_LIMIT, -0.001, 1).map((l) => ({ price: Number(l.price), amount: Number(l.amount) })),
+      asksTruncated: true,
+      bidsTruncated: true,
+    };
+    const d = depth(truncated);
+    expect(d.mid).toBeCloseTo(1, 3);
+    expect(d.upIsLowerBound).toBe(true);
+    expect(d.downIsLowerBound).toBe(true);
+  });
+
+  it('is not a lower bound when the truncated side already clears past the target', () => {
+    // Asks run from 1 up to 1 + 199*2 = 399, far past the 100x target of 150; the 429-level
+    // cutoff cannot be hiding anything that would change up100x.
+    const wide: OrderBook = {
+      asks: levels(ORDER_BOOK_PAGE_LIMIT, 2, 1).map((l) => ({ price: Number(l.price), amount: Number(l.amount) })),
+      bids: [{ price: 1, amount: 1 }],
+      asksTruncated: true,
+    };
+    const d = depth(wide);
+    expect(d.upIsLowerBound).toBe(false);
+  });
+
+  it('flags only the side that is actually truncated', () => {
+    const asksOnly: OrderBook = {
+      asks: levels(ORDER_BOOK_PAGE_LIMIT, 0.001, 1).map((l) => ({ price: Number(l.price), amount: Number(l.amount) })),
+      bids: [{ price: 1, amount: 1 }],
+      asksTruncated: true,
+      bidsTruncated: false,
+    };
+    const d = depth(asksOnly);
+    expect(d.upIsLowerBound).toBe(true);
+    expect(d.downIsLowerBound).toBe(false);
   });
 });

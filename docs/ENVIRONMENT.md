@@ -40,7 +40,11 @@ npm run keeper -- --oracle C... [--network mainnet|testnet] [--rpc URL] [--once]
                   [--pool C... | --exposure-usd N] [--market-horizon URL]
                   [--webhook-format json|slack|discord|telegram] [--alert-min critical|warn|info]
                   [--alert-reminder-hours 6] [--test-alert] [--test-heartbeat]
+npm run fit-rates -- --asset CODE:ISSUER [--days 180] [--horizon URL] [--quote CODE:ISSUER]
+npm run validate-report -- schemas/latest.schema.json reports/latest.json
 ```
+
+`fit-rates` reproduces damper-contracts [ADR 0005](https://github.com/Dampper/damper-contracts/blob/main/docs/adr/0005-rates-fitted-to-real-data.md)'s rate-fitting analysis for any asset: it pulls hourly SDEX `trade_aggregations` from Horizon (`--quote` defaults to `USDC_CLASSIC`, `--horizon` to `DAMPER_HORIZON_URL`/mainnet), turns them into a volume-weighted price series, measures the hour-over-hour percent move, and prints the p50/p90/p99/p99.9/max table plus a suggested tight and policy rate in bps/hour (see `src/rateFitting.ts`). It needs network access to Horizon; `test/rateFitting.test.ts` exercises the same code against a fixture recorded from a real pull, so the analysis itself is tested without one.
 
 `--interval` is in seconds and is raised to at least 60. Without `--submit` the keeper only reports.
 

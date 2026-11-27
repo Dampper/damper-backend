@@ -63,12 +63,20 @@ jobs:
         run: |
           mkdir publish
           cp data/keeper-state.json publish/keeper-state.json 2>/dev/null \
-            || echo '{"updatedAt":"1970-01-01T00:00:00.000Z","suspicious":{}}' > publish/keeper-state.json
+            || echo '{"updatedAt":"1970-01-01T00:00:00.000Z","suspicious":{},"notify":{}}' > publish/keeper-state.json
           # No status file means the pass failed before it could read the oracle; publishing
           # nothing would leave the dashboard showing a stale report with no sign it is stale,
           # so an empty, clearly-timestamped one is published instead.
           cp data/oracle-status.json publish/oracle-status.json 2>/dev/null \
             || echo "{\"at\":$(date -u +%s),\"network\":\"${{ vars.DAMPER_NETWORK || 'mainnet' }}\",\"oracle\":\"${{ vars.DAMPER_ORACLE }}\",\"assets\":[]}" > publish/oracle-status.json
+          # Fails the run if StatusReport (src/keeper/status.ts) has drifted from
+          # schemas/oracle-status.schema.json (#15). Skipped for the synthesized empty
+          # fallback above, which is handwritten to match the schema and not worth a tsx
+          # startup in a path that `if: always()` can also hit on a failed checkout.
+          if [ -f data/oracle-status.json ]; then
+            npm run validate-report -- schemas/oracle-status.schema.json publish/oracle-status.json
+          fi
+          cp schemas/oracle-status.schema.json publish/oracle-status.schema.json
           cd publish
           git init -q -b keeper-state
           git config user.name "github-actions[bot]"

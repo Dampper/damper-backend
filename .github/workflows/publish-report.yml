@@ -48,6 +48,11 @@ jobs:
             console.log(`${r.pools.length} pools, ${r.errors.length} skipped, ledger ${r.ledger}`);
           '
 
+      # Fails the run if ScanReport (src/scan.ts) has drifted from schemas/latest.schema.json,
+      # instead of only showing up later as a runtime parse error in damper-frontend (#15).
+      - name: Validate the report against its JSON Schema
+        run: npm run validate-report -- schemas/latest.schema.json reports/latest.json
+
       - name: Publish to the reports branch
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -55,6 +60,7 @@ jobs:
           mkdir publish
           cp reports/latest.json publish/latest.json
           cp data/pools.json publish/pools.json
+          cp schemas/latest.schema.json publish/latest.schema.json
           cd publish
           git init -q -b reports
           git config user.name "github-actions[bot]"
