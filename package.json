@@ -12,6 +12,8 @@
     "typecheck": "tsc -p . --noEmit",
     "scan": "tsx src/cli/scan.ts",
     "keeper": "tsx src/cli/keeper.ts",
+    "fit-rates": "tsx src/cli/fitRates.ts",
+    "validate-report": "tsx src/cli/validateReport.ts",
     "test": "vitest run"
   },
   "dependencies": {

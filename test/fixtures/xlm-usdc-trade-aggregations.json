@@ -1,0 +1,482 @@
+[
+  {
+    "timestamp": 1763856000000,
+    "base_volume": "357106.5503909",
+    "counter_volume": "82145.5704979"
+  },
+  {
+    "timestamp": 1763859600000,
+    "base_volume": "482996.7063487",
+    "counter_volume": "112060.7911260"
+  },
+  {
+    "timestamp": 1763863200000,
+    "base_volume": "660157.7373153",
+    "counter_volume": "155342.3628409"
+  },
+  {
+    "timestamp": 1763866800000,
+    "base_volume": "229840.7262100",
+    "counter_volume": "54147.8343549"
+  },
+  {
+    "timestamp": 1763870400000,
+    "base_volume": "631507.7988646",
+    "counter_volume": "150365.8358083"
+  },
+  {
+    "timestamp": 1763874000000,
+    "base_volume": "286849.2712070",
+    "counter_volume": "68213.1944120"
+  },
+  {
+    "timestamp": 1763877600000,
+    "base_volume": "383775.1172657",
+    "counter_volume": "91641.8576368"
+  },
+  {
+    "timestamp": 1763881200000,
+    "base_volume": "406459.4182481",
+    "counter_volume": "96184.6921336"
+  },
+  {
+    "timestamp": 1763884800000,
+    "base_volume": "134142.6282501",
+    "counter_volume": "31783.5822938"
+  },
+  {
+    "timestamp": 1763888400000,
+    "base_volume": "87977.5488224",
+    "counter_volume": "20877.8993550"
+  },
+  {
+    "timestamp": 1763892000000,
+    "base_volume": "181707.8661866",
+    "counter_volume": "42997.2117317"
+  },
+  {
+    "timestamp": 1763895600000,
+    "base_volume": "455252.0427675",
+    "counter_volume": "108374.2028966"
+  },
+  {
+    "timestamp": 1763899200000,
+    "base_volume": "562046.8178248",
+    "counter_volume": "134914.5126659"
+  },
+  {
+    "timestamp": 1763902800000,
+    "base_volume": "288223.6565761",
+    "counter_volume": "69359.9627519"
+  },
+  {
+    "timestamp": 1763906400000,
+    "base_volume": "617274.5221699",
+    "counter_volume": "149345.9433408"
+  },
+  {
+    "timestamp": 1763910000000,
+    "base_volume": "526014.3908185",
+    "counter_volume": "127487.0434833"
+  },
+  {
+    "timestamp": 1763913600000,
+    "base_volume": "1588657.7830579",
+    "counter_volume": "390281.9908886"
+  },
+  {
+    "timestamp": 1763917200000,
+    "base_volume": "833670.5884794",
+    "counter_volume": "202913.1428670"
+  },
+  {
+    "timestamp": 1763920800000,
+    "base_volume": "535421.9675606",
+    "counter_volume": "131474.1313423"
+  },
+  {
+    "timestamp": 1763924400000,
+    "base_volume": "568739.0243319",
+    "counter_volume": "141279.1874425"
+  },
+  {
+    "timestamp": 1763928000000,
+    "base_volume": "533692.3511805",
+    "counter_volume": "133247.0652223"
+  },
+  {
+    "timestamp": 1763931600000,
+    "base_volume": "629218.0347876",
+    "counter_volume": "157364.8592005"
+  },
+  {
+    "timestamp": 1763935200000,
+    "base_volume": "484364.8903952",
+    "counter_volume": "121308.8172061"
+  },
+  {
+    "timestamp": 1763938800000,
+    "base_volume": "706496.4363374",
+    "counter_volume": "175078.2099690"
+  },
+  {
+    "timestamp": 1763942400000,
+    "base_volume": "1243181.2266683",
+    "counter_volume": "305764.2937935"
+  },
+  {
+    "timestamp": 1763946000000,
+    "base_volume": "1098887.6884848",
+    "counter_volume": "269439.3520980"
+  },
+  {
+    "timestamp": 1763949600000,
+    "base_volume": "1343777.6940612",
+    "counter_volume": "335989.9557676"
+  },
+  {
+    "timestamp": 1763953200000,
+    "base_volume": "821917.4133353",
+    "counter_volume": "206797.5911614"
+  },
+  {
+    "timestamp": 1763956800000,
+    "base_volume": "840315.9129661",
+    "counter_volume": "207410.2288977"
+  },
+  {
+    "timestamp": 1763960400000,
+    "base_volume": "556303.1342698",
+    "counter_volume": "138542.9926372"
+  },
+  {
+    "timestamp": 1763964000000,
+    "base_volume": "518675.7388590",
+    "counter_volume": "128775.8853544"
+  },
+  {
+    "timestamp": 1763967600000,
+    "base_volume": "484836.5579720",
+    "counter_volume": "120023.8594412"
+  },
+  {
+    "timestamp": 1763971200000,
+    "base_volume": "359141.6351119",
+    "counter_volume": "88471.6481322"
+  },
+  {
+    "timestamp": 1763974800000,
+    "base_volume": "1022777.3583864",
+    "counter_volume": "248887.7760178"
+  },
+  {
+    "timestamp": 1763978400000,
+    "base_volume": "298703.9241226",
+    "counter_volume": "72558.5821521"
+  },
+  {
+    "timestamp": 1763982000000,
+    "base_volume": "452109.2778373",
+    "counter_volume": "110458.6970137"
+  },
+  {
+    "timestamp": 1763985600000,
+    "base_volume": "237171.3533626",
+    "counter_volume": "58134.9014599"
+  },
+  {
+    "timestamp": 1763989200000,
+    "base_volume": "684229.4217895",
+    "counter_volume": "169494.2539009"
+  },
+  {
+    "timestamp": 1763992800000,
+    "base_volume": "1632943.3719127",
+    "counter_volume": "400739.9823553"
+  },
+  {
+    "timestamp": 1763996400000,
+    "base_volume": "1491742.3371148",
+    "counter_volume": "365112.6262614"
+  },
+  {
+    "timestamp": 1764000000000,
+    "base_volume": "1091984.0353123",
+    "counter_volume": "268481.7584055"
+  },
+  {
+    "timestamp": 1764003600000,
+    "base_volume": "998587.1370339",
+    "counter_volume": "249114.1726811"
+  },
+  {
+    "timestamp": 1764007200000,
+    "base_volume": "595935.5850057",
+    "counter_volume": "150763.6696953"
+  },
+  {
+    "timestamp": 1764010800000,
+    "base_volume": "436867.5619219",
+    "counter_volume": "111728.9003939"
+  },
+  {
+    "timestamp": 1764014400000,
+    "base_volume": "756480.3951129",
+    "counter_volume": "194986.7271474"
+  },
+  {
+    "timestamp": 1764018000000,
+    "base_volume": "448248.1518563",
+    "counter_volume": "115021.2349083"
+  },
+  {
+    "timestamp": 1764021600000,
+    "base_volume": "270195.9319769",
+    "counter_volume": "69481.8441824"
+  },
+  {
+    "timestamp": 1764025200000,
+    "base_volume": "257409.2434924",
+    "counter_volume": "65804.0110457"
+  },
+  {
+    "timestamp": 1764028800000,
+    "base_volume": "424545.4439628",
+    "counter_volume": "108169.1886488"
+  },
+  {
+    "timestamp": 1764032400000,
+    "base_volume": "346759.0270613",
+    "counter_volume": "88445.2874353"
+  },
+  {
+    "timestamp": 1764036000000,
+    "base_volume": "525567.5861024",
+    "counter_volume": "133283.6448481"
+  },
+  {
+    "timestamp": 1764039600000,
+    "base_volume": "239412.8864255",
+    "counter_volume": "60709.0581079"
+  },
+  {
+    "timestamp": 1764043200000,
+    "base_volume": "305209.5053505",
+    "counter_volume": "77317.2143571"
+  },
+  {
+    "timestamp": 1764046800000,
+    "base_volume": "298977.8909469",
+    "counter_volume": "75792.5907902"
+  },
+  {
+    "timestamp": 1764050400000,
+    "base_volume": "828714.7738919",
+    "counter_volume": "208102.8121652"
+  },
+  {
+    "timestamp": 1764054000000,
+    "base_volume": "294626.5887905",
+    "counter_volume": "74108.7856603"
+  },
+  {
+    "timestamp": 1764057600000,
+    "base_volume": "422893.7794948",
+    "counter_volume": "105500.5254552"
+  },
+  {
+    "timestamp": 1764061200000,
+    "base_volume": "343701.5424876",
+    "counter_volume": "85137.6923911"
+  },
+  {
+    "timestamp": 1764064800000,
+    "base_volume": "80867.4723927",
+    "counter_volume": "20058.5495765"
+  },
+  {
+    "timestamp": 1764068400000,
+    "base_volume": "205720.6033790",
+    "counter_volume": "51006.1376913"
+  },
+  {
+    "timestamp": 1764072000000,
+    "base_volume": "328772.6663171",
+    "counter_volume": "81781.8261540"
+  },
+  {
+    "timestamp": 1764075600000,
+    "base_volume": "521700.9614020",
+    "counter_volume": "129381.4442552"
+  },
+  {
+    "timestamp": 1764079200000,
+    "base_volume": "1287132.4337444",
+    "counter_volume": "314665.5161509"
+  },
+  {
+    "timestamp": 1764082800000,
+    "base_volume": "827666.5163112",
+    "counter_volume": "201392.4965608"
+  },
+  {
+    "timestamp": 1764086400000,
+    "base_volume": "385200.3655748",
+    "counter_volume": "94813.1608955"
+  },
+  {
+    "timestamp": 1764090000000,
+    "base_volume": "562154.6028180",
+    "counter_volume": "140035.4034611"
+  },
+  {
+    "timestamp": 1764093600000,
+    "base_volume": "453805.2094753",
+    "counter_volume": "113481.5996583"
+  },
+  {
+    "timestamp": 1764097200000,
+    "base_volume": "680491.9749770",
+    "counter_volume": "167818.5848618"
+  },
+  {
+    "timestamp": 1764100800000,
+    "base_volume": "628223.0355279",
+    "counter_volume": "156990.5850832"
+  },
+  {
+    "timestamp": 1764104400000,
+    "base_volume": "221726.1642873",
+    "counter_volume": "55555.8239769"
+  },
+  {
+    "timestamp": 1764108000000,
+    "base_volume": "500944.1222674",
+    "counter_volume": "125588.4479924"
+  },
+  {
+    "timestamp": 1764111600000,
+    "base_volume": "374577.9803062",
+    "counter_volume": "94784.6784850"
+  },
+  {
+    "timestamp": 1764115200000,
+    "base_volume": "169895.9932274",
+    "counter_volume": "42957.0976171"
+  },
+  {
+    "timestamp": 1764118800000,
+    "base_volume": "246749.1811984",
+    "counter_volume": "62274.3979683"
+  },
+  {
+    "timestamp": 1764122400000,
+    "base_volume": "127121.8738882",
+    "counter_volume": "32042.4431766"
+  },
+  {
+    "timestamp": 1764126000000,
+    "base_volume": "228828.6983702",
+    "counter_volume": "57305.1331960"
+  },
+  {
+    "timestamp": 1764129600000,
+    "base_volume": "158958.4874159",
+    "counter_volume": "39551.0344432"
+  },
+  {
+    "timestamp": 1764133200000,
+    "base_volume": "181997.1884969",
+    "counter_volume": "45429.4196371"
+  },
+  {
+    "timestamp": 1764136800000,
+    "base_volume": "172287.3445839",
+    "counter_volume": "43226.2211247"
+  },
+  {
+    "timestamp": 1764140400000,
+    "base_volume": "167077.5556732",
+    "counter_volume": "42255.4962604"
+  },
+  {
+    "timestamp": 1764144000000,
+    "base_volume": "150544.5078772",
+    "counter_volume": "38275.0977572"
+  },
+  {
+    "timestamp": 1764147600000,
+    "base_volume": "366278.7100694",
+    "counter_volume": "92842.2654672"
+  },
+  {
+    "timestamp": 1764151200000,
+    "base_volume": "374425.6837421",
+    "counter_volume": "94358.2967316"
+  },
+  {
+    "timestamp": 1764154800000,
+    "base_volume": "352776.3864614",
+    "counter_volume": "88395.8392029"
+  },
+  {
+    "timestamp": 1764158400000,
+    "base_volume": "344822.6260308",
+    "counter_volume": "85876.8400909"
+  },
+  {
+    "timestamp": 1764162000000,
+    "base_volume": "379297.9218708",
+    "counter_volume": "94816.9403166"
+  },
+  {
+    "timestamp": 1764165600000,
+    "base_volume": "902331.3275520",
+    "counter_volume": "225609.4919691"
+  },
+  {
+    "timestamp": 1764169200000,
+    "base_volume": "787205.5987621",
+    "counter_volume": "196652.5039835"
+  },
+  {
+    "timestamp": 1764172800000,
+    "base_volume": "645461.0449420",
+    "counter_volume": "163310.5228748"
+  },
+  {
+    "timestamp": 1764176400000,
+    "base_volume": "1065413.6647953",
+    "counter_volume": "272724.0306690"
+  },
+  {
+    "timestamp": 1764180000000,
+    "base_volume": "882990.5830737",
+    "counter_volume": "229989.9860069"
+  },
+  {
+    "timestamp": 1764183600000,
+    "base_volume": "1521322.3076594",
+    "counter_volume": "397079.8221195"
+  },
+  {
+    "timestamp": 1764187200000,
+    "base_volume": "696503.6848020",
+    "counter_volume": "181528.9390978"
+  },
+  {
+    "timestamp": 1764190800000,
+    "base_volume": "394951.8246723",
+    "counter_volume": "102732.9984227"
+  },
+  {
+    "timestamp": 1764194400000,
+    "base_volume": "289747.1633322",
+    "counter_volume": "75419.3388591"
+  },
+  {
+    "timestamp": 1764198000000,
+    "base_volume": "121531.5898421",
+    "counter_volume": "31428.1337259"
+  }
+]
