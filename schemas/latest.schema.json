@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/Dampper/damper-backend/reports/latest.schema.json",
+  "title": "Damper scan report (latest.json)",
+  "description": "The shape written by src/scan.ts (ScanReport) and published to the `reports` branch. Kept by hand next to the TypeScript interfaces it mirrors; a drift between the two is exactly what this schema exists to catch (#15).",
+  "type": "object",
+  "required": ["scannedAt", "ledger", "pools", "errors"],
+  "additionalProperties": false,
+  "properties": {
+    "scannedAt": { "type": "string", "format": "date-time" },
+    "ledger": { "type": "integer", "minimum": 0 },
+    "pools": { "type": "array", "items": { "$ref": "#/definitions/pool" } },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["pool", "error"],
+        "additionalProperties": false,
+        "properties": {
+          "pool": { "type": "string" },
+          "error": { "type": "string" }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "tier": { "enum": ["critical", "high", "medium", "low", "external", "n/a"] },
+    "pool": {
+      "type": "object",
+      "required": ["id", "name", "status", "borrowingOpen", "oracle", "supplyUsd", "borrowedUsd", "tier", "reserves"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "status": { "type": "string" },
+        "borrowingOpen": { "type": "boolean" },
+        "oracle": { "type": "string" },
+        "supplyUsd": { "type": "number" },
+        "borrowedUsd": { "type": "number" },
+        "tier": { "$ref": "#/definitions/tier" },
+        "reserves": { "type": "array", "items": { "$ref": "#/definitions/reserve" } }
+      }
+    },
+    "reserve": {
+      "type": "object",
+      "required": [
+        "asset",
+        "symbol",
+        "collateralFactor",
+        "liabilityFactor",
+        "maxUtil",
+        "supplied",
+        "borrowed",
+        "enabled",
+        "source",
+        "collateralSide",
+        "debtSide",
+        "notes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "asset": { "type": "string" },
+        "symbol": { "type": "string" },
+        "priceUsd": { "type": "number" },
+        "collateralFactor": { "type": "number", "minimum": 0 },
+        "liabilityFactor": { "type": "number", "minimum": 0 },
+        "maxUtil": { "type": "number", "minimum": 0 },
+        "supplied": { "type": "number", "minimum": 0 },
+        "borrowed": { "type": "number", "minimum": 0 },
+        "enabled": { "type": "boolean" },
+        "source": { "$ref": "#/definitions/priceSource" },
+        "market": { "$ref": "#/definitions/market" },
+        "collateralSide": { "$ref": "#/definitions/side" },
+        "debtSide": { "$ref": "#/definitions/side" },
+        "notes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "side": {
+      "type": "object",
+      "required": ["exposureUsd", "tier"],
+      "additionalProperties": false,
+      "properties": {
+        "exposureUsd": { "type": "number", "minimum": 0 },
+        "costUsd": { "type": "number", "minimum": 0 },
+        "tier": { "$ref": "#/definitions/tier" }
+      }
+    },
+    "priceSource": {
+      "type": "object",
+      "required": ["poolOracle", "upstream", "upstreamKind", "isBaseAsset"],
+      "additionalProperties": false,
+      "properties": {
+        "poolOracle": { "type": "string" },
+        "upstream": { "type": "string" },
+        "upstreamKind": { "enum": ["reflector-dex", "reflector-cex", "operator-feed", "unknown"] },
+        "upstreamAdmin": { "type": "string" },
+        "upstreamAsset": { "type": "array" },
+        "maxDevPct": { "type": "number" },
+        "resolutionSec": { "type": "number" },
+        "maxAgeSec": { "type": "number" },
+        "isBaseAsset": { "type": "boolean" }
+      }
+    },
+    "market": {
+      "type": "object",
+      "required": ["up2x", "up10x", "up100x", "down2x", "down10x", "upIsLowerBound", "downIsLowerBound", "volume24hUsd"],
+      "additionalProperties": false,
+      "properties": {
+        "mid": { "type": "number" },
+        "up2x": { "type": "number", "minimum": 0 },
+        "up10x": { "type": "number", "minimum": 0 },
+        "up100x": { "type": "number", "minimum": 0 },
+        "down2x": { "type": "number", "minimum": 0 },
+        "down10x": { "type": "number", "minimum": 0 },
+        "upIsLowerBound": { "type": "boolean" },
+        "downIsLowerBound": { "type": "boolean" },
+        "volume24hUsd": { "type": "number", "minimum": 0 }
+      }
+    }
+  }
+}
