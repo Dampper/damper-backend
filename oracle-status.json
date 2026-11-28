@@ -1,0 +1,45 @@
+{
+  "at": 1795863402,
+  "network": "testnet",
+  "oracle": "CCBCV5NCMEDCW4WPWF45P36JXZ7VV3QJR5T4X3CICJPGRYRDXKH636GQ",
+  "assets": [
+    {
+      "asset": "Stellar:CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "decimals": 7,
+      "policy": {
+        "upBpsPerHour": 1500,
+        "downBpsPerHour": 4294967295,
+        "windowSecs": 86400
+      },
+      "effectivePolicy": {
+        "upBpsPerHour": 150,
+        "downBpsPerHour": 4294967295,
+        "windowSecs": 86400
+      },
+      "gate": {
+        "tightUpBpsPerHour": 150,
+        "tightDownBpsPerHour": 4294967295,
+        "minCostRatioBps": 100000,
+        "maxEvidenceAge": 3600
+      },
+      "anchor": {
+        "price": "10600000",
+        "timestamp": 1795482037
+      },
+      "evidence": {
+        "upCost": "4035000000",
+        "upExposure": "300000000",
+        "downCost": "3025000000",
+        "downExposure": "300000000",
+        "timestamp": 1795482182
+      },
+      "alerts": [
+        {
+          "severity": "critical",
+          "code": "no-quote",
+          "message": "oracle returns no price: too few fresh upstream feeds, or all are stale"
+        }
+      ]
+    }
+  ]
+}
