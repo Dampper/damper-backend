@@ -1,0 +1,455 @@
+{
+  "scannedAt": "2026-11-28T07:51:48.410Z",
+  "ledger": 65713245,
+  "pools": [
+    {
+      "id": "CAJJZSGMMM3PD7N33TAPHGBUGTB43OC73HVIK2L2G6BNGGGYOSSYBXBD",
+      "name": "Fixed",
+      "status": "on ice",
+      "borrowingOpen": false,
+      "oracle": "CCVTVW2CVA7JLH4ROQGP3CU4T3EXVCK66AZGSM4MUQPXAI4QHCZPOATS",
+      "supplyUsd": 126604182.89210302,
+      "borrowedUsd": 31980237.364861056,
+      "tier": "external",
+      "reserves": [
+        {
+          "asset": "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
+          "symbol": "XLM",
+          "priceUsd": 0.1244029,
+          "collateralFactor": 0.75,
+          "liabilityFactor": 1.3333333333333333,
+          "maxUtil": 0.7,
+          "supplied": 698769898.3509849,
+          "borrowed": 723945.8519373,
+          "enabled": true,
+          "source": {
+            "poolOracle": "CCVTVW2CVA7JLH4ROQGP3CU4T3EXVCK66AZGSM4MUQPXAI4QHCZPOATS",
+            "upstream": "CAFJZQWSED6YAWZU3GWRTOCNPPCGBN32L7QV43XX5LZLFTK6JLN34DLN",
+            "upstreamKind": "reflector-cex",
+            "upstreamAsset": [
+              "Other",
+              "XLM"
+            ],
+            "maxDevPct": 60,
+            "resolutionSec": 300,
+            "maxAgeSec": 900,
+            "isBaseAsset": false
+          },
+          "collateralSide": {
+            "exposureUsd": 3817486.592644671,
+            "tier": "external"
+          },
+          "debtSide": {
+            "exposureUsd": 60760240.28787345,
+            "tier": "external"
+          },
+          "notes": [
+            "priced from off-chain venues (Reflector CEX feed)",
+            "max_dev 60% vs the previous round only (300s); a price held for two rounds passes"
+          ]
+        },
+        {
+          "asset": "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75",
+          "symbol": "USDC",
+          "priceUsd": 1.0004146,
+          "collateralFactor": 0.95,
+          "liabilityFactor": 1.0526315789473684,
+          "maxUtil": 0.9,
+          "supplied": 39578055.2225429,
+          "borrowed": 31832469.0190422,
+          "enabled": true,
+          "source": {
+            "poolOracle": "CCVTVW2CVA7JLH4ROQGP3CU4T3EXVCK66AZGSM4MUQPXAI4QHCZPOATS",
+            "upstream": "CAFJZQWSED6YAWZU3GWRTOCNPPCGBN32L7QV43XX5LZLFTK6JLN34DLN",
+            "upstreamKind": "reflector-cex",
+            "upstreamAsset": [
+              "Other",
+              "USDC"
+            ],
+            "maxDevPct": 20,
+            "resolutionSec": 300,
+            "maxAgeSec": 900,
+            "isBaseAsset": false
+          },
+          "collateralSide": {
+            "exposureUsd": 60788375.78540126,
+            "tier": "external"
+          },
+          "debtSide": {
+            "exposureUsd": 3789351.0951168523,
+            "tier": "external"
+          },
+          "notes": [
+            "priced from off-chain venues (Reflector CEX feed)",
+            "max_dev 20% vs the previous round only (300s); a price held for two rounds passes"
+          ]
+        },
+        {
+          "asset": "CDTKPWPLOURQA2SGTKTUQOWRCBZEORB4BWBOMJ3D3ZTQQSGE5F6JBQLV",
+          "symbol": "EURC",
+          "priceUsd": 1.0940919,
+          "collateralFactor": 0.95,
+          "liabilityFactor": 1.0526315789473684,
+          "maxUtil": 0.9,
+          "supplied": 73775.1740024,
+          "borrowed": 40681.8117743,
+          "enabled": true,
+          "source": {
+            "poolOracle": "CCVTVW2CVA7JLH4ROQGP3CU4T3EXVCK66AZGSM4MUQPXAI4QHCZPOATS",
+            "upstream": "CAFJZQWSED6YAWZU3GWRTOCNPPCGBN32L7QV43XX5LZLFTK6JLN34DLN",
+            "upstreamKind": "reflector-cex",
+            "upstreamAsset": [
+              "Other",
+              "EURC"
+            ],
+            "maxDevPct": 20,
+            "resolutionSec": 300,
+            "maxAgeSec": 900,
+            "isBaseAsset": false
+          },
+          "collateralSide": {
+            "exposureUsd": 64549591.3829903,
+            "tier": "external"
+          },
+          "debtSide": {
+            "exposureUsd": 28135.497527818527,
+            "tier": "external"
+          },
+          "notes": [
+            "priced from off-chain venues (Reflector CEX feed)",
+            "max_dev 20% vs the previous round only (300s); a price held for two rounds passes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CBAKAZUEJBAFA2DCGBRS2WKJT3FNIMJBHTFL76AY7XMAVEINQNNIQWAO",
+      "name": "Fixed v2.1",
+      "status": "admin active",
+      "borrowingOpen": true,
+      "oracle": "CCVTVW2CVA7JLH4ROQGP3CU4T3EXVCK66AZGSM4MUQPXAI4QHCZPOATS",
+      "supplyUsd": 291791.50108393654,
+      "borrowedUsd": 97933.10673076802,
+      "tier": "external",
+      "reserves": [
+        {
+          "asset": "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
+          "symbol": "XLM",
+          "priceUsd": 0.1244029,
+          "collateralFactor": 0.75,
+          "liabilityFactor": 1.3333333333333333,
+          "maxUtil": 0.7,
+          "supplied": 1643865.2280839,
+          "borrowed": 155663.423192,
+          "enabled": true,
+          "source": {
+            "poolOracle": "CCVTVW2CVA7JLH4ROQGP3CU4T3EXVCK66AZGSM4MUQPXAI4QHCZPOATS",
+            "upstream": "CAFJZQWSED6YAWZU3GWRTOCNPPCGBN32L7QV43XX5LZLFTK6JLN34DLN",
+            "upstreamKind": "reflector-cex",
+            "upstreamAsset": [
+              "Other",
+              "XLM"
+            ],
+            "maxDevPct": 60,
+            "resolutionSec": 300,
+            "maxAgeSec": 900,
+            "isBaseAsset": false
+          },
+          "collateralSide": {
+            "exposureUsd": 0,
+            "tier": "n/a"
+          },
+          "debtSide": {
+            "exposureUsd": 123786.13983894694,
+            "tier": "external"
+          },
+          "notes": [
+            "priced from off-chain venues (Reflector CEX feed)",
+            "max_dev 60% vs the previous round only (300s); a price held for two rounds passes"
+          ]
+        },
+        {
+          "asset": "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75",
+          "symbol": "USDC",
+          "priceUsd": 1.0004146,
+          "collateralFactor": 0.95,
+          "liabilityFactor": 1.0526315789473684,
+          "maxUtil": 0.9,
+          "supplied": 40772.4735416,
+          "borrowed": 36699.1098658,
+          "enabled": true,
+          "source": {
+            "poolOracle": "CCVTVW2CVA7JLH4ROQGP3CU4T3EXVCK66AZGSM4MUQPXAI4QHCZPOATS",
+            "upstream": "CAFJZQWSED6YAWZU3GWRTOCNPPCGBN32L7QV43XX5LZLFTK6JLN34DLN",
+            "upstreamKind": "reflector-cex",
+            "upstreamAsset": [
+              "Other",
+              "USDC"
+            ],
+            "maxDevPct": 20,
+            "resolutionSec": 300,
+            "maxAgeSec": 900,
+            "isBaseAsset": false
+          },
+          "collateralSide": {
+            "exposureUsd": 123786.13983894694,
+            "tier": "external"
+          },
+          "debtSide": {
+            "exposureUsd": 0,
+            "tier": "n/a"
+          },
+          "notes": [
+            "priced from off-chain venues (Reflector CEX feed)",
+            "max_dev 20% vs the previous round only (300s); a price held for two rounds passes"
+          ]
+        },
+        {
+          "asset": "CDTKPWPLOURQA2SGTKTUQOWRCBZEORB4BWBOMJ3D3ZTQQSGE5F6JBQLV",
+          "symbol": "EURC",
+          "priceUsd": 1.0940919,
+          "collateralFactor": 0.95,
+          "liabilityFactor": 1.0526315789473684,
+          "maxUtil": 0.9,
+          "supplied": 42501.476971,
+          "borrowed": 38254.3734626,
+          "enabled": true,
+          "source": {
+            "poolOracle": "CCVTVW2CVA7JLH4ROQGP3CU4T3EXVCK66AZGSM4MUQPXAI4QHCZPOATS",
+            "upstream": "CAFJZQWSED6YAWZU3GWRTOCNPPCGBN32L7QV43XX5LZLFTK6JLN34DLN",
+            "upstreamKind": "reflector-cex",
+            "upstreamAsset": [
+              "Other",
+              "EURC"
+            ],
+            "maxDevPct": 20,
+            "resolutionSec": 300,
+            "maxAgeSec": 900,
+            "isBaseAsset": false
+          },
+          "collateralSide": {
+            "exposureUsd": 123786.13983894694,
+            "tier": "external"
+          },
+          "debtSide": {
+            "exposureUsd": 0,
+            "tier": "n/a"
+          },
+          "notes": [
+            "priced from off-chain venues (Reflector CEX feed)",
+            "max_dev 20% vs the previous round only (300s); a price held for two rounds passes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CDMAVJPFXPADND3YRL4BSM3AKZWCTFMX27GLLXCML3PD62HEQS5FPVAI",
+      "name": "Etherfuse",
+      "status": "admin frozen",
+      "borrowingOpen": false,
+      "oracle": "CAVRP26CWW6IUEXBRA3Q2T2SHBUVBC2DF43M4E23LEZGW5ZEIB62HALS",
+      "supplyUsd": 14527.52471881959,
+      "borrowedUsd": 1243.0969919534766,
+      "tier": "external",
+      "reserves": [
+        {
+          "asset": "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
+          "symbol": "XLM",
+          "priceUsd": 0.12440298448463,
+          "collateralFactor": 0.75,
+          "liabilityFactor": 1.3333333333333333,
+          "maxUtil": 0.7,
+          "supplied": 8135.4683304,
+          "borrowed": 3334.4659414,
+          "enabled": true,
+          "source": {
+            "poolOracle": "CAVRP26CWW6IUEXBRA3Q2T2SHBUVBC2DF43M4E23LEZGW5ZEIB62HALS",
+            "upstream": "CAFJZQWSED6YAWZU3GWRTOCNPPCGBN32L7QV43XX5LZLFTK6JLN34DLN",
+            "upstreamKind": "reflector-cex",
+            "upstreamAsset": [
+              "Other",
+              "XLM"
+            ],
+            "maxDevPct": 10,
+            "resolutionSec": 300,
+            "maxAgeSec": 600,
+            "isBaseAsset": false
+          },
+          "collateralSide": {
+            "exposureUsd": 11609.482912952211,
+            "tier": "external"
+          },
+          "debtSide": {
+            "exposureUsd": 293.63606356485354,
+            "tier": "external"
+          },
+          "notes": [
+            "priced from off-chain venues (Reflector CEX feed)",
+            "max_dev 10% vs the previous round only (300s); a price held for two rounds passes"
+          ]
+        },
+        {
+          "asset": "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75",
+          "symbol": "USDC",
+          "priceUsd": 1.0004146431989,
+          "collateralFactor": 0.95,
+          "liabilityFactor": 1.0526315789473684,
+          "maxUtil": 0.95,
+          "supplied": 5474.9104582,
+          "borrowed": 823.1467903,
+          "enabled": true,
+          "source": {
+            "poolOracle": "CAVRP26CWW6IUEXBRA3Q2T2SHBUVBC2DF43M4E23LEZGW5ZEIB62HALS",
+            "upstream": "CAFJZQWSED6YAWZU3GWRTOCNPPCGBN32L7QV43XX5LZLFTK6JLN34DLN",
+            "upstreamKind": "reflector-cex",
+            "upstreamAsset": [
+              "Other",
+              "USDC"
+            ],
+            "maxDevPct": 5,
+            "resolutionSec": 300,
+            "maxAgeSec": 600,
+            "isBaseAsset": false
+          },
+          "collateralSide": {
+            "exposureUsd": 7523.285516078586,
+            "tier": "external"
+          },
+          "debtSide": {
+            "exposureUsd": 4379.83346043848,
+            "tier": "external"
+          },
+          "notes": [
+            "priced from off-chain venues (Reflector CEX feed)",
+            "max_dev 5% vs the previous round only (300s); a price held for two rounds passes"
+          ]
+        },
+        {
+          "asset": "CAL6ER2TI6CTRAY6BFXWNWA7WTYXUXTQCHUBCIBU5O6KM3HJFG6Z6VXV",
+          "symbol": "CETES",
+          "priceUsd": 0.06101762065865,
+          "collateralFactor": 0.8,
+          "liabilityFactor": 1.25,
+          "maxUtil": 0.9,
+          "supplied": 108798.3620889,
+          "borrowed": 23.5215991,
+          "enabled": true,
+          "source": {
+            "poolOracle": "CAVRP26CWW6IUEXBRA3Q2T2SHBUVBC2DF43M4E23LEZGW5ZEIB62HALS",
+            "upstream": "CBWUSO5XZICR4FPKAQ4YDIYNZ2T26QMKUHWOSMPMWTXHFP3SJTAXGNCK",
+            "upstreamKind": "operator-feed",
+            "upstreamAdmin": "GDH3FRHOOWXYXEASH43N2VOVFOPJSVJF3EQFSLBLJYFPHOUAF4N4AETH",
+            "upstreamAsset": [
+              "Stellar",
+              "CAL6ER2TI6CTRAY6BFXWNWA7WTYXUXTQCHUBCIBU5O6KM3HJFG6Z6VXV"
+            ],
+            "maxDevPct": 5,
+            "resolutionSec": 300,
+            "maxAgeSec": 600,
+            "isBaseAsset": false
+          },
+          "collateralSide": {
+            "exposureUsd": 5929.798740927582,
+            "tier": "external"
+          },
+          "debtSide": {
+            "exposureUsd": 5973.320235589484,
+            "tier": "external"
+          },
+          "notes": [
+            "prices pushed by admin key GDH3FRHOOWXYXEASH43N2VOVFOPJSVJF3EQFSLBLJYFPHOUAF4N4AETH; not derived from SDEX trades",
+            "max_dev 5% vs the previous round only (300s); a price held for two rounds passes"
+          ]
+        },
+        {
+          "asset": "CBLV4ATSIWU67CFSQU2NVRKINQIKUZ2ODSZBUJTJ43VJVRSBTZYOPNUR",
+          "symbol": "USTRY",
+          "priceUsd": 1.08185055614534,
+          "collateralFactor": 0.9,
+          "liabilityFactor": 1.1111111111111112,
+          "maxUtil": 0.9,
+          "supplied": 619.1792715,
+          "borrowed": 3.1022239,
+          "enabled": true,
+          "source": {
+            "poolOracle": "CAVRP26CWW6IUEXBRA3Q2T2SHBUVBC2DF43M4E23LEZGW5ZEIB62HALS",
+            "upstream": "CBWUSO5XZICR4FPKAQ4YDIYNZ2T26QMKUHWOSMPMWTXHFP3SJTAXGNCK",
+            "upstreamKind": "operator-feed",
+            "upstreamAdmin": "GDH3FRHOOWXYXEASH43N2VOVFOPJSVJF3EQFSLBLJYFPHOUAF4N4AETH",
+            "upstreamAsset": [
+              "Stellar",
+              "CBLV4ATSIWU67CFSQU2NVRKINQIKUZ2ODSZBUJTJ43VJVRSBTZYOPNUR"
+            ],
+            "maxDevPct": 5,
+            "resolutionSec": 300,
+            "maxAgeSec": 600,
+            "isBaseAsset": false
+          },
+          "collateralSide": {
+            "exposureUsd": 11303.601623865221,
+            "tier": "external"
+          },
+          "debtSide": {
+            "exposureUsd": 599.517352651845,
+            "tier": "external"
+          },
+          "notes": [
+            "prices pushed by admin key GDH3FRHOOWXYXEASH43N2VOVFOPJSVJF3EQFSLBLJYFPHOUAF4N4AETH; not derived from SDEX trades",
+            "max_dev 5% vs the previous round only (300s); a price held for two rounds passes"
+          ]
+        },
+        {
+          "asset": "CD6M4R2322BYCY2LNWM74PEBQAQ63SA3DUJLI3L4225U4ZVCLMSCBCIS",
+          "symbol": "TESOURO",
+          "priceUsd": 0.23114152517446,
+          "collateralFactor": 0.8,
+          "liabilityFactor": 1.25,
+          "maxUtil": 0.9,
+          "supplied": 3157.3338445,
+          "borrowed": 0,
+          "enabled": true,
+          "source": {
+            "poolOracle": "CAVRP26CWW6IUEXBRA3Q2T2SHBUVBC2DF43M4E23LEZGW5ZEIB62HALS",
+            "upstream": "CBWUSO5XZICR4FPKAQ4YDIYNZ2T26QMKUHWOSMPMWTXHFP3SJTAXGNCK",
+            "upstreamKind": "operator-feed",
+            "upstreamAdmin": "GDH3FRHOOWXYXEASH43N2VOVFOPJSVJF3EQFSLBLJYFPHOUAF4N4AETH",
+            "upstreamAsset": [
+              "Stellar",
+              "CD6M4R2322BYCY2LNWM74PEBQAQ63SA3DUJLI3L4225U4ZVCLMSCBCIS"
+            ],
+            "maxDevPct": 5,
+            "resolutionSec": 300,
+            "maxAgeSec": 600,
+            "isBaseAsset": false
+          },
+          "collateralSide": {
+            "exposureUsd": 11246.307112244662,
+            "tier": "external"
+          },
+          "debtSide": {
+            "exposureUsd": 656.8118642724041,
+            "tier": "external"
+          },
+          "notes": [
+            "prices pushed by admin key GDH3FRHOOWXYXEASH43N2VOVFOPJSVJF3EQFSLBLJYFPHOUAF4N4AETH; not derived from SDEX trades",
+            "max_dev 5% vs the previous round only (300s); a price held for two rounds passes"
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "pool": "CBYOBT7ZCCLQCBUYYIABZLSEGDPEUWXCUXQTZYOG3YBDR7U357D5ZIRF",
+      "error": "Failed to fetch oralce price: HostError: Error(Contract, #2)"
+    },
+    {
+      "pool": "CCCCIQSDILITHMM7PBSLVDT5MISSY7R26MNZXCX4H7J5JQ5FPIYOGYFS",
+      "error": "HorizonError is not defined"
+    },
+    {
+      "pool": "CDE65QK2ROZ32V2LVLBOKYPX47TYMYO37Z6ASQTBRTBNK53C7C6QF4Y7",
+      "error": "ReserveConfig scvMap value malformed"
+    }
+  ]
+}
